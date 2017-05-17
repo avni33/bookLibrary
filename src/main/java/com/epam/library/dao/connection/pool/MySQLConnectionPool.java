@@ -14,7 +14,7 @@ import com.epam.library.dao.exception.DAOException;
 
 public class MySQLConnectionPool {
 
-	private static final String DRIVER_NAME = "com.mysql.jdbc.Driver";
+	private static final String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
 	private static final String URL = "mysql://kc0n2ce3tn676cz0:os4taudxkucgi3yq@irkm0xtlo2pcmvvz.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/j1k1az6c2zhkczmg";
 	private static final String USERNAME = "kc0n2ce3tn676cz0";
 	private static final String PASSWORD = "os4taudxkucgi3yq";
