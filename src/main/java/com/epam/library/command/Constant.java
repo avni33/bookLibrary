@@ -3,9 +3,9 @@ package com.epam.library.command;
 public final class Constant {
 	
 	public static final String HOME_JSP = "/Home.jsp";
-	public static final String HOME_JSP_REDIRECT = "/library/Home.jsp";
-	public static final String USER_JSP_REDIRECT = "/library/User.jsp";
-	public static final String ADMINISTRATOR_JSP_REDIRECT = "/library/Administrator.jsp";
+	public static final String HOME_JSP_REDIRECT = "/Home.jsp";
+	public static final String USER_JSP_REDIRECT = "/User.jsp";
+	public static final String ADMINISTRATOR_JSP_REDIRECT = "/Administrator.jsp";
 	public static final String USER_JSP_FORWARD = "/User.jsp";
 	public static final String ADMINISTRATOR_JSP_FORWARD = "/Administrator.jsp";
 	public static final String BOOK_DETAIL_JSP = "/BookDetail.jsp";
