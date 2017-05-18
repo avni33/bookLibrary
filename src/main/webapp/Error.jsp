@@ -23,16 +23,16 @@
 		</select>
 	</form>
 	<h3>
-		<fmt:message key="error.header.errorDetails" />
+		<fmt:message key="text.header.errorDetails" />
 	</h3>
-	<strong><fmt:message key="error.label.statusCode" /></strong>:
+	<strong><fmt:message key="text.label.statusCode" /></strong>:
 	<c:out value="${requestScope['javax.servlet.error.status_code']}"></c:out>
 	<br>
-	<strong><fmt:message key="handling.label.uri" /></strong>:
+	<strong><fmt:message key="text.label.uri" /></strong>:
 	<c:out value="${requestScope['javax.servlet.error.request_uri']}"></c:out>
 
 	<br>
 	<br>
-	<a href="Home.jsp"><fmt:message key="handling.button.home" /></a>
+	<a href="Home.jsp"><fmt:message key="text.button.home" /></a>
 </body>
 </html>

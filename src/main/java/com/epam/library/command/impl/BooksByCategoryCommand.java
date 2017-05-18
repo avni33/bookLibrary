@@ -1,8 +1,12 @@
 package com.epam.library.command.impl;
 
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
@@ -42,7 +46,7 @@ public class BooksByCategoryCommand implements Command {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
 		String category = request.getParameter(CATEGORY);
 		HttpSession session = request.getSession(false);
@@ -53,26 +57,27 @@ public class BooksByCategoryCommand implements Command {
 			session.setAttribute(BOOKS, books);
 			session.setAttribute(CATEGORY, category);
 			String commandName = request.getParameter(COMMAND);
-			targetResource = getTargetResource(commandName, request, user);
+			getTargetResource(commandName, request, user, response);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.FORWARD);
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.FORWARD);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+			requestDispatcher.forward(request, response);
 		}
-		return targetResource;
 	}
 	
-	private String getTargetResource(String commandName, HttpServletRequest request, User user) {
+	private void getTargetResource(String commandName, HttpServletRequest request,
+			User user, HttpServletResponse response) throws IOException, ServletException {
 		String targetResource = null;
 		if(CommandEnum.LOGIN.toString().equals(commandName)) {
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.REDIRECT);
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.REDIRECT);
+			response.sendRedirect(targetResource);
 		} else {
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.FORWARD);
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.FORWARD);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+			requestDispatcher.forward(request, response);
 		}
-		return targetResource;
 	}
 
 }

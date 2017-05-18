@@ -56,55 +56,55 @@ tr:nth-child(even) {
 			<option value="be" ${language == 'be' ? 'selected' : ''}>Belarusian</option>
 		</select>
 	</form>
-	<h1><fmt:message key="details.header.detais" /></h1>
+	<h1><fmt:message key="text.header.detais" /></h1>
 	<table align="center">
 		<tr>
-			<td><fmt:message key="details.heading.id" /></td>
+			<td><fmt:message key="text.heading.id" /></td>
 			<td><c:out value="${book.id }" /></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="details.heading.title" /></td>
+			<td><fmt:message key="text.heading.title" /></td>
 			<td><c:out value="${book.title }" /></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="details.heading.author" /></td>
+			<td><fmt:message key="text.heading.author" /></td>
 			<td><c:out value="${book.author }" /></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="details.heading.description" /></td>
+			<td><fmt:message key="text.heading.description" /></td>
 			<td><c:out value="${book.description }" /></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="details.heading.price" /></td>
+			<td><fmt:message key="text.heading.price" /></td>
 			<td><c:out value="${book.price }" /></td>
 		</tr>
 		<tr>
-			<td><fmt:message key="details.heading.year" /></td>
+			<td><fmt:message key="text.heading.year" /></td>
 			<td><c:out value="${book.publishYear }" /></td>
 		</tr>
 		<c:if
 			test="${book['class'] == 'class com.epam.library.domain.PaperBook' }">
 			<tr>
-				<td><fmt:message key="details.heading.category" /></td>
-				<td><fmt:message key="role.table.paperbook" /></td>
+				<td><fmt:message key="text.heading.category" /></td>
+				<td><fmt:message key="text.table.paperbook" /></td>
 			</tr>
 			<tr>
-				<td><fmt:message key="details.heading.cover" /></td>
+				<td><fmt:message key="text.heading.cover" /></td>
 				<td><c:out value="${book.coverType }" /></td>
 			</tr>
 			<tr>
-				<td><fmt:message key="details.heading.pages" /></td>
+				<td><fmt:message key="text.heading.pages" /></td>
 				<td><c:out value="${book.noOfPages }" /></td>
 			</tr>
 		</c:if>
 		<c:if
 			test="${book['class'] == 'class com.epam.library.domain.Ebook' }">
 			<tr>
-				<td><fmt:message key="details.heading.category" /></td>
-				<td><fmt:message key="role.table.ebook" /></td>
+				<td><fmt:message key="text.heading.category" /></td>
+				<td><fmt:message key="text.table.ebook" /></td>
 			</tr>
 			<tr>
-				<td><fmt:message key="details.heading.file" /></td>
+				<td><fmt:message key="text.heading.file" /></td>
 				<td><c:out value="${book.fileFormat }" /></td>
 			</tr>
 		</c:if>
@@ -114,7 +114,7 @@ tr:nth-child(even) {
 		<form name="backForm" action="Controller" method="get">
 		<input type="hidden" name="command" value="categoryChange" />
 		<input type="hidden" name="category" value="all" />
-		<fmt:message key="details.button.back" var="buttonValue" />
+		<fmt:message key="text.button.back" var="buttonValue" />
 		<input type="submit" value="${buttonValue }" />
 	</form>
 </body>

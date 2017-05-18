@@ -8,15 +8,12 @@ import com.epam.library.dao.DAOFactory;
 import com.epam.library.dao.exception.DAOException;
 import com.epam.library.domain.Book;
 import com.epam.library.service.BookService;
+import com.epam.library.service.checker.ResultChecker;
 import com.epam.library.service.exception.ServiceException;
-import com.epam.library.service.validator.Validator;
 
 public class BookServiceImpl implements BookService {
 
 	private static final BookServiceImpl INSTANCE = new BookServiceImpl();
-	private static final String ALL = "all";
-	private static final String PAPER = "paper";
-	private static final String EBOOK = "ebook";
 	
 	private DAOFactory daoFactory = DAOFactory.getInstance();
 	private BookDAO bookDAO = daoFactory.getBookDao();
@@ -30,8 +27,13 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public List<Book> getBooksByCategory(String category, String language) throws ServiceException {
-		List<Book> books = switchCategory(category, language);
-		Validator.validateBooksList(books);
+		List<Book> books = new ArrayList<Book>();
+		try {
+			books = bookDAO.getBookByCategory(language, category);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		ResultChecker.checkBooksList(books);
 		return books;
 	}
 
@@ -43,7 +45,7 @@ public class BookServiceImpl implements BookService {
 		} catch (DAOException e) {
 			throw new ServiceException(e);
 		}
-		Validator.validateBook(book);
+		ResultChecker.checkBook(book);
 		return book;
 	}
 
@@ -55,28 +57,7 @@ public class BookServiceImpl implements BookService {
 		} catch (DAOException e) {
 			throw new ServiceException(e);
 		}
-		Validator.validateBooksList(books);
-		return books;
-	}
-
-	private List<Book> switchCategory(String category, String language) 
-			throws ServiceException {
-		List<Book> books = new ArrayList<Book>();
-		try {
-			switch (category) {
-			case ALL:
-				books = bookDAO.getAllBooks(language);
-				break;
-			case PAPER:
-				books = bookDAO.getPaperBooks(language);
-				break;
-			case EBOOK:
-				books = bookDAO.getEbooks(language);
-				break;
-			}
-		} catch (DAOException e) {
-			throw new ServiceException(e);
-		}
+		ResultChecker.checkBooksList(books);
 		return books;
 	}
 

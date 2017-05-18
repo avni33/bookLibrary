@@ -1,6 +1,11 @@
 package com.epam.library.command.impl;
 
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
@@ -40,7 +45,7 @@ public class GetBookFromIdCommand implements Command {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
 		HttpSession session = request.getSession(false);
 		String language = LanguageProvider.getLanguage(request);
@@ -55,8 +60,8 @@ public class GetBookFromIdCommand implements Command {
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.FORWARD);
 		}
-		request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.FORWARD);
-		return targetResource;
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+		requestDispatcher.forward(request, response);
 	}
 	
 	public void putBookInRequest(Book book, HttpServletRequest request) {

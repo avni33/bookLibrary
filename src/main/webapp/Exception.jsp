@@ -23,20 +23,20 @@
 		</select>
 	</form>
 	<h3>
-		<fmt:message key="exception.header.exceptionDetails" />
+		<fmt:message key="text.header.exceptionDetails" />
 	</h3>
 	<ul>
-		<li><fmt:message key="exception.label.servletName" />:<c:out
+		<li><fmt:message key="text.label.servletName" />:<c:out
 				value="${requestScope['javax.servlet.error.servlet_name']}"></c:out></li>
-		<li><fmt:message key="exception.label.exceptionName" />:<c:out
+		<li><fmt:message key="text.label.exceptionName" />:<c:out
 				value="${requestScope['javax.servlet.error.exception']}"></c:out></li>
-		<li><fmt:message key="handling.label.uri" />:<c:out
+		<li><fmt:message key="text.label.uri" />:<c:out
 				value="${requestScope['javax.servlet.error.request_uri']}"></c:out></li>
 	</ul>
 
 	<br>
 	<br>
-	<a href="Home.jsp"><fmt:message key="handling.button.home" /></a>
+	<a href="Home.jsp"><fmt:message key="text.button.home" /></a>
 
 </body>
 </html>

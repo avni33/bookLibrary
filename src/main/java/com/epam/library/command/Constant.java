@@ -14,7 +14,6 @@ public final class Constant {
 	public static final String LANGUAGE = "language";
 	public static final String REDIRECT = "redirect";
 	public static final String FORWARD = "forward";
-	public static final String REQUEST_SEND_TYPE = "requestSendType";
 	
 	private Constant() {}
 

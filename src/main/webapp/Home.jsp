@@ -37,7 +37,6 @@ body {
 	</c:if>
 	<form id = "langForm" style="float: right;" action = "Home.jsp">
 		<select id="language" name="language" onchange="submit();">
-		
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
 			<option value="be" ${language == 'be' ? 'selected' : ''}>Belarusian</option>
@@ -45,23 +44,35 @@ body {
 	</form>
 	
 	<h1>
-		<fmt:message key="home.header.welcome" />
+		<fmt:message key="text.header.welcome" />
 	</h1>
 	<form name="loginForm" action="Controller" method="post">
-		<label for="userName"><fmt:message key="home.label.username" />:</label>
+		<label for="userName"><fmt:message key="text.label.username" />:</label>
 		<input type="text" name="userName" /> <br> <br>
-		<label for="password"><fmt:message key="home.label.password" />:</label>
+		<label for="password"><fmt:message key="text.label.password" />:</label>
 		<input type="password" name="password" /><br> <br> <input
 			type="hidden" name="command" value="login" />
 			<input
 			type="hidden" name="category" value="all" />
-		<c:if test="${not empty error }">
+		<c:if test="${not empty error and error == 'Enter username'}">
 			<div class="error">
-				<c:out value="${error }"></c:out>
+				<fmt:message key="text.error.usernameError" />
 				<br> <br>
 			</div>
 		</c:if>
-		<fmt:message key="home.button.login" var="buttonValue" />
+		<c:if test="${not empty error and error == 'Enter password' }">
+			<div class="error">
+				<fmt:message key="text.error.passwordError" />
+				<br> <br>
+			</div>
+		</c:if>
+		<c:if test="${not empty error and error == 'Wrong details' }">
+			<div class="error">
+				<fmt:message key="text.error.user" />
+				<br> <br>
+			</div>
+		</c:if>
+		<fmt:message key="text.button.login" var="buttonValue" />
 		<input type="submit" value="${buttonValue }" /><br> <br>
 	</form>
 </body>

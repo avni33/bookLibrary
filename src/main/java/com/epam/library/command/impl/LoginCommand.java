@@ -1,6 +1,11 @@
 package com.epam.library.command.impl;
 
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
@@ -35,7 +40,7 @@ public class LoginCommand implements Command {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
 		String userName = request.getParameter(USER_NAME);
 		String password = request.getParameter(PASSWORD);
@@ -44,15 +49,14 @@ public class LoginCommand implements Command {
 		try {
 			User user = userService.validateGetUser(userName, password, language);
 			session.setAttribute(Constant.USER, user);
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.REDIRECT);
-			targetResource = booksByCategoryCommand.execute(request);
+			booksByCategoryCommand.execute(request, response);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.FORWARD);
 			targetResource = Constant.HOME_JSP;
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+			requestDispatcher.forward(request, response);
 		}
-		return targetResource;
 	}
 
 }

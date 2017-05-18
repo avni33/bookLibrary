@@ -69,15 +69,15 @@ td {
 		</select>
 	</form>
 	<h1>
-		<fmt:message key="role.header.hello" />
+		<fmt:message key="text.header.hello" />
 		,
-		<fmt:message key="user.header.user" />
+		<fmt:message key="text.header.user" />
 		<c:out value="${user.name }"></c:out>
 	</h1>
 	<form id="searchForm" action=Controller method="get">
 		<input type="hidden" name="command" value="searchBook" /> <input
 			type="text" name="searchText" />
-		<fmt:message key="role.button.search" var="searchButton" />
+		<fmt:message key="text.button.search" var="searchButton" />
 		<input type="submit" value="${searchButton }" />
 	</form>
 	<br><br>
@@ -85,11 +85,11 @@ td {
 		<input type="hidden" name="command" value="categoryChange" /> <select
 			id="category" name="category" onchange="submit()">
 			<option disabled selected style="display: none"><fmt:message
-					key="role.option.select" /></option>
-			<option value="all"><fmt:message key="role.option.all" /></option>
+					key="text.option.select" /></option>
+			<option value="all"><fmt:message key="text.option.all" /></option>
 			<option value="paper"><fmt:message
-					key="role.option.paperbook" /></option>
-			<option value="ebook"><fmt:message key="role.option.ebook" /></option>
+					key="text.option.paperbook" /></option>
+			<option value="ebook"><fmt:message key="text.option.ebook" /></option>
 		</select>
 	</form>
 	<br>
@@ -101,11 +101,11 @@ td {
 			<table align="center">
 				<tbody>
 					<tr>
-						<th><fmt:message key="role.table.sr" /></th>
-						<th><fmt:message key="role.table.title" /></th>
-						<th><fmt:message key="role.table.author" /></th>
-						<th><fmt:message key="role.table.price" /></th>
-						<th><fmt:message key="role.table.category" /></th>
+						<th><fmt:message key="text.table.sr" /></th>
+						<th><fmt:message key="text.table.title" /></th>
+						<th><fmt:message key="text.table.author" /></th>
+						<th><fmt:message key="text.table.price" /></th>
+						<th><fmt:message key="text.table.category" /></th>
 					</tr>
 					<c:set var="srNo" value="1" scope="session"></c:set>
 					<c:forEach items="${books}" var="book">
@@ -122,11 +122,11 @@ td {
 										minFractionDigits="0" /></td>
 								<c:if
 									test="${book['class'] == 'class com.epam.library.domain.PaperBook' }">
-									<td><fmt:message key="role.table.paperbook" /></td>
+									<td><fmt:message key="text.table.paperbook" /></td>
 								</c:if>
 								<c:if
 									test="${book['class'] == 'class com.epam.library.domain.Ebook' }">
-									<td><fmt:message key="role.table.ebook" /></td>
+									<td><fmt:message key="text.table.ebook" /></td>
 								</c:if>
 								<c:set var="srNo" value="${srNo + 1 }" scope="request"></c:set>
 							</tr>
@@ -137,7 +137,7 @@ td {
 		</c:when>
 		<c:otherwise>
 			<div class="error">
-				<c:out value="${error }"></c:out>
+				<fmt:message key="text.error.booksError" />
 				<br> <br>
 			</div>
 		</c:otherwise>
@@ -149,7 +149,7 @@ td {
 	<br>
 	<form name="logoutForm" action="Controller" method="post">
 		<input type="hidden" name="command" value="logout" />
-		<fmt:message key="role.button.logout" var="buttonValue" />
+		<fmt:message key="text.button.logout" var="buttonValue" />
 		<input type="submit" value="${buttonValue }" />
 	</form>
 

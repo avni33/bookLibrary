@@ -1,6 +1,9 @@
 package com.epam.library.command.impl;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.epam.library.command.Command;
@@ -17,14 +20,13 @@ public class LogoutCommand implements Command {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String targetResource = Constant.HOME_JSP_REDIRECT;
 		HttpSession session = request.getSession(false);
 		if(session != null) {
 			session.invalidate();
 		}
-		request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.REDIRECT);
-		return targetResource;
+		response.sendRedirect(targetResource);
 	}
 
 }

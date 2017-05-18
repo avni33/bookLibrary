@@ -1,6 +1,11 @@
 package com.epam.library.command.impl;
 
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
@@ -36,7 +41,7 @@ public class ChangeLanguageCommand implements Command {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request) {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
 		String previousCommand = request.getParameter(PREVIOUS_COMMAND);
 		HttpSession session = request.getSession(false);
@@ -47,15 +52,14 @@ public class ChangeLanguageCommand implements Command {
 			session.setAttribute(Constant.USER, user);
 			CommandProvider commandProvider = CommandProvider.getInstance();
 			Command command = commandProvider.getCommand(previousCommand);
-			targetResource = command.execute(request);
+			command.execute(request, response);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			request.setAttribute(Constant.REQUEST_SEND_TYPE, Constant.FORWARD);
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.FORWARD);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+			requestDispatcher.forward(request, response);
 		}
-		
-		return targetResource;
 	}
 
 }

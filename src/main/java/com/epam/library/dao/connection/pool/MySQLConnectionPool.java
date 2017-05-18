@@ -6,11 +6,8 @@ import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.epam.library.dao.exception.DAOException;
+import com.epam.library.dao.exception.DAORuntimeException;
 
 public class MySQLConnectionPool {
 
@@ -19,8 +16,6 @@ public class MySQLConnectionPool {
 	private static final String USERNAME = "kc0n2ce3tn676cz0";
 	private static final String PASSWORD = "os4taudxkucgi3yq";
 	private static final int CONNECTION_COUNT = 3;
-
-	private static final Logger LOG = LogManager.getLogger(MySQLConnectionPool.class.getName());
 
 	private static BlockingQueue<Connection> availableConnections = new ArrayBlockingQueue<Connection>(
 			CONNECTION_COUNT);
@@ -31,15 +26,15 @@ public class MySQLConnectionPool {
 			loadDriver();
 			for (int i = 0; i < CONNECTION_COUNT; i++) {
 				Connection connection = openConnection();
-				if (connection != null) {
-					availableConnections.put(connection);
+				if (connection == null) {
+					throw new DAORuntimeException("Connection is null");
 				}
+				availableConnections.put(connection);
 			}
 		} catch (InterruptedException e) {
-			LOG.log(Level.ERROR, "Problem during adding connections to available connections", e);
-		} catch (DAOException e) {
-			LOG.log(Level.ERROR, e);
-		}
+			throw new DAORuntimeException("Problem while putting "
+					+ "connection in available connections.", e);
+		} 
 	}
 	
 	public static MySQLConnectionPool getInstance() {
@@ -80,20 +75,20 @@ public class MySQLConnectionPool {
 		}
 	}
 
-	private void loadDriver() throws DAOException {
+	private void loadDriver() {
 		try {
 			Class.forName(DRIVER_NAME);
 		} catch (ClassNotFoundException e) {
-			throw new DAOException("Problem during loading MySQL Driver.", e);
+			throw new DAORuntimeException("Problem during loading MySQL Driver.", e);
 		}
 	}
 
-	private Connection openConnection() throws DAOException {
+	private Connection openConnection() {
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 		} catch (SQLException e) {
-			throw new DAOException(e);
+			throw new DAORuntimeException("Problem while getting connection", e);
 		}
 		return connection;
 	}
