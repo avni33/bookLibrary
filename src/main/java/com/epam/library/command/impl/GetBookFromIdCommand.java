@@ -32,7 +32,8 @@ public class GetBookFromIdCommand implements Command {
 			LogManager.getLogger(LoginCommand.class.getName());
 	
 	private static final String BOOK = "book";
-	private static final String BOOK_ID = "id";
+	private static final String TARGET_PAGE = "targetPage";
+	private static final String EDIT = "edit";
 	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
 	private BookService bookService = serviceFactory.getBookService();
@@ -50,11 +51,16 @@ public class GetBookFromIdCommand implements Command {
 		HttpSession session = request.getSession(false);
 		String language = LanguageProvider.getLanguage(request);
 		User user = (User) session.getAttribute(Constant.USER);
-		int bookId = Integer.parseInt(request.getParameter(BOOK_ID));
+		String targetPage = (String) request.getParameter(TARGET_PAGE);
+		int bookId = Integer.parseInt(request.getParameter(Constant.BOOK_ID));
 		try {
 			Book book = bookService.getBookFromId(language, bookId);
 			putBookInRequest(book, request);
-			targetResource = Constant.BOOK_DETAIL_JSP;
+			if(EDIT.equals(targetPage)) {
+				targetResource = Constant.EDIT_BOOK_JSP;
+			} else {
+				targetResource = Constant.BOOK_DETAIL_JSP;
+			}
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());

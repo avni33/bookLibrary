@@ -14,46 +14,50 @@ import org.apache.logging.log4j.Logger;
 
 import com.epam.library.command.Command;
 import com.epam.library.command.Constant;
+import com.epam.library.command.util.LanguageProvider;
 import com.epam.library.domain.User;
 import com.epam.library.service.ServiceFactory;
 import com.epam.library.service.UserService;
 import com.epam.library.service.exception.ServiceException;
 
-public class LoginCommand implements Command {
+public class EditUserCommand implements Command {
 	
-	private static final LoginCommand INSTANCE = new LoginCommand();
-	
+	private final static EditUserCommand INSTANCE = new EditUserCommand();
+
 	private static final Logger LOG = 
 			LogManager.getLogger(LoginCommand.class.getName());
-		
+	
+	private final static String NAME = "name";
+	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
 	private UserService userService = serviceFactory.getUserService();	
 	BooksByCategoryCommand booksByCategoryCommand = BooksByCategoryCommand.getInstance();
 	
-	private LoginCommand() {}
+	private EditUserCommand() {}
 	
-	public static LoginCommand getInstance() {
+	public static EditUserCommand getInstance() {
 		return INSTANCE;
 	}
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
-		String userName = request.getParameter(Constant.USER_NAME);
-		String password = request.getParameter(Constant.PASSWORD);
 		HttpSession session = request.getSession(false);
-		String language = (String)session.getAttribute(Constant.LANGUAGE);
+		User user = (User) session.getAttribute(Constant.USER);
+		user.setName(request.getParameter(NAME));
+		String language = LanguageProvider.getLanguage(request);
 		try {
-			User user = userService.validateGetUser(userName, password, language);
-			session.setAttribute(Constant.USER, user);
+			userService.editUser(user, language);
 			booksByCategoryCommand.execute(request, response);
+			session.setAttribute(Constant.USER, user);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			targetResource = Constant.HOME_JSP;
+			targetResource = Constant.EDIT_USER_JSP;
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
 			requestDispatcher.forward(request, response);
 		}
+		
 	}
 
 }

@@ -137,9 +137,5 @@ public abstract class Book implements Serializable {
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
-	
-	public Book getBook() {
-		return this;
-	}
 
 }

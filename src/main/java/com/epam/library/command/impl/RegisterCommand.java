@@ -6,7 +6,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,25 +13,23 @@ import org.apache.logging.log4j.Logger;
 
 import com.epam.library.command.Command;
 import com.epam.library.command.Constant;
-import com.epam.library.domain.User;
 import com.epam.library.service.ServiceFactory;
 import com.epam.library.service.UserService;
 import com.epam.library.service.exception.ServiceException;
 
-public class LoginCommand implements Command {
+public class RegisterCommand implements Command {
 	
-	private static final LoginCommand INSTANCE = new LoginCommand();
-	
+	private static final RegisterCommand INSTANCE = new RegisterCommand();
 	private static final Logger LOG = 
 			LogManager.getLogger(LoginCommand.class.getName());
-		
+	private static final String NAME = "name";
+	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
 	private UserService userService = serviceFactory.getUserService();	
-	BooksByCategoryCommand booksByCategoryCommand = BooksByCategoryCommand.getInstance();
 	
-	private LoginCommand() {}
+	private RegisterCommand() {}
 	
-	public static LoginCommand getInstance() {
+	public static RegisterCommand getInstance() {
 		return INSTANCE;
 	}
 
@@ -41,16 +38,15 @@ public class LoginCommand implements Command {
 		String targetResource = null;
 		String userName = request.getParameter(Constant.USER_NAME);
 		String password = request.getParameter(Constant.PASSWORD);
-		HttpSession session = request.getSession(false);
-		String language = (String)session.getAttribute(Constant.LANGUAGE);
+		String name = request.getParameter(NAME);
 		try {
-			User user = userService.validateGetUser(userName, password, language);
-			session.setAttribute(Constant.USER, user);
-			booksByCategoryCommand.execute(request, response);
+			userService.registerUser(userName, password, name);
+			targetResource = Constant.HOME_JSP_REDIRECT;
+			response.sendRedirect(targetResource);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			targetResource = Constant.HOME_JSP;
+			targetResource = Constant.REGISTER_JSP;
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
 			requestDispatcher.forward(request, response);
 		}

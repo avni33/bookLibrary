@@ -16,6 +16,7 @@ public class Controller extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 		
 	private static final String COMMAND = "command";
+	private static final String CHARACTER_ENCODING = "UTF-8";
        
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processRequest(request, response);
@@ -27,6 +28,7 @@ public class Controller extends HttpServlet {
 	}
 	
 	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		request.setCharacterEncoding(CHARACTER_ENCODING);
 		String commandName = request.getParameter(COMMAND);
 		HttpSession session = request.getSession();
 		session.setAttribute(COMMAND, commandName);

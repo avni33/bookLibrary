@@ -17,6 +17,14 @@ public class Validator {
 		}
 	}
 	
+	public static void validateRegisterDetails(User user) 
+			throws ServiceException {
+		validateLoginDetails(user);
+		if(user.getName().isEmpty() || user.getName() == null) {
+			throw new ServiceException("Enter name");
+		}
+	}
+	
 	public static void validateUser(User user) 
 			throws ServiceException {
 		if(user.getId() == ZERO) {
@@ -24,5 +32,5 @@ public class Validator {
 					"Wrong details");
 		}
 	}
-
+	
 }

@@ -43,12 +43,15 @@ td {
 </style>
 
 </head>
-<body>
+<body onkeydown="return (event.keyCode != 116)">
 
 	<c:if test="${empty user or user.role.role ne 'user'}">
 		<c:redirect url="Home.jsp" />
 	</c:if>
 	<c:if test="${empty command or command == 'login'}">
+		<c:set var="command" value="categoryChange" />
+	</c:if>
+	<c:if test="${command == 'editUser'}">
 		<c:set var="command" value="categoryChange" />
 	</c:if>
 	<c:if test="${command == 'changeLanguage'}">
@@ -74,7 +77,14 @@ td {
 		<fmt:message key="text.header.user" />
 		<c:out value="${user.name }"></c:out>
 	</h1>
-	<form id="searchForm" action=Controller method="get">
+	<br>
+	<form id="editUserForm" action="EditUser.jsp">
+		<fmt:message key="text.button.editProfile" var="editButton" />
+		<input type="submit" value="${editButton }" />
+	</form>
+	<br>
+	<br>
+	<form id="searchForm" action="Controller" method="get">
 		<input type="hidden" name="command" value="searchBook" /> <input
 			type="text" name="searchText" />
 		<fmt:message key="text.button.search" var="searchButton" />

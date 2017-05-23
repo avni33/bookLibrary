@@ -70,7 +70,7 @@ public class BooksByCategoryCommand implements Command {
 	private void getTargetResource(String commandName, HttpServletRequest request,
 			User user, HttpServletResponse response) throws IOException, ServletException {
 		String targetResource = null;
-		if(CommandEnum.LOGIN.toString().equals(commandName)) {
+		if(CommandEnum.LOGIN.toString().equals(commandName) || CommandEnum.ADD_BOOK.toString().equals(commandName)) {
 			targetResource = targetFileProvider.getTargetFile(user.getRole().getRole(), Constant.REDIRECT);
 			response.sendRedirect(targetResource);
 		} else {

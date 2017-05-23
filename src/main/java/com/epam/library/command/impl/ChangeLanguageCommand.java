@@ -26,6 +26,8 @@ public class ChangeLanguageCommand implements Command {
 	
 	private static final ChangeLanguageCommand INSTANCE = new ChangeLanguageCommand();
 	private static final String PREVIOUS_COMMAND = "previousCmd"; 
+	private static final String TARGET = "target"; 
+	private static final String EDIT = "edit"; 
 	
 	private static final Logger LOG = 
 			LogManager.getLogger(LoginCommand.class.getName());
@@ -43,6 +45,7 @@ public class ChangeLanguageCommand implements Command {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
+		String target = request.getParameter(TARGET);
 		String previousCommand = request.getParameter(PREVIOUS_COMMAND);
 		HttpSession session = request.getSession(false);
 		String language = LanguageProvider.getLanguage(request);
@@ -50,9 +53,15 @@ public class ChangeLanguageCommand implements Command {
 		try {
 			user = userService.getUserFromId(user, language);
 			session.setAttribute(Constant.USER, user);
-			CommandProvider commandProvider = CommandProvider.getInstance();
-			Command command = commandProvider.getCommand(previousCommand);
-			command.execute(request, response);
+			if(EDIT.equals(target)) {
+				targetResource = Constant.EDIT_USER_JSP;
+				RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
+				requestDispatcher.forward(request, response);
+			} else {
+				CommandProvider commandProvider = CommandProvider.getInstance();
+				Command command = commandProvider.getCommand(previousCommand);
+				command.execute(request, response);
+			}
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());

@@ -74,9 +74,5 @@ public class PaperBook extends Book {
 				+ getDescription() + ", Price=" + getPrice() + ", PublishYear=" + getPublishYear() +
 				"coverType=" + coverType + ", noOfPages=" + noOfPages + " ]";
 	}
-	
-	public PaperBook getBook() {
-		return this;
-	}
 
 }

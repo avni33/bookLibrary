@@ -32,13 +32,16 @@ tr:nth-child(even) {
 }
 </style>
 </head>
-<body>
+<body onkeydown="return (event.keyCode != 116)">
 	<c:if test="${empty user}">
 		<c:redirect url="Home.jsp" />
 	</c:if>
 	
 		<c:if test="${empty command or command == 'login'}">
 		<c:set var="command" value="categoryChange" />
+	</c:if>
+	<c:if test="${command == 'editBook'}">
+		<c:set var="command" value="bookFromId" />
 	</c:if>
 	<c:if test="${command == 'changeLanguage'}">
 		<c:set var="command" value="${param.previousCmd }" />
@@ -48,6 +51,7 @@ tr:nth-child(even) {
 	</c:if>
 	<form style="float: right;" action="Controller" method="get">
 		<input type="hidden" name="previousCmd" value="${command }" />
+		<input type = "hidden" name = "targetPage" value = "${param.targetPage }"/>
 		<input type="hidden" name="command" value="changeLanguage" />
 			<input type = "hidden" name = "id" value = "${param.id }"/> <select
 			id="language" name="language" onchange="submit()">
@@ -109,6 +113,14 @@ tr:nth-child(even) {
 			</tr>
 		</c:if>
 	</table>
+	<br><br>
+	<form action = "Controller" method = "get">
+							<input type="hidden" name="command" value="bookFromId" />
+							<input type = "hidden" name = "targetPage" value = "edit"/>
+							<input type = "hidden" name = "id" value = "${book.id }"/>
+							<fmt:message key="text.button.edit" var="editbuttonValue" />
+							<input type="submit" value="${editbuttonValue }" />
+						</form>
 	
 	<br><br><br>
 		<form name="backForm" action="Controller" method="get">

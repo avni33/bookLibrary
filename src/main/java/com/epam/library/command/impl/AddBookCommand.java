@@ -1,12 +1,12 @@
 package com.epam.library.command.impl;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,43 +14,40 @@ import org.apache.logging.log4j.Logger;
 
 import com.epam.library.command.Command;
 import com.epam.library.command.Constant;
-import com.epam.library.domain.User;
+import com.epam.library.command.util.ParameterProvider;
+import com.epam.library.service.BookService;
 import com.epam.library.service.ServiceFactory;
-import com.epam.library.service.UserService;
 import com.epam.library.service.exception.ServiceException;
 
-public class LoginCommand implements Command {
-	
-	private static final LoginCommand INSTANCE = new LoginCommand();
-	
+public class AddBookCommand implements Command {
+
+	private static final AddBookCommand INSTANCE = new AddBookCommand();
 	private static final Logger LOG = 
 			LogManager.getLogger(LoginCommand.class.getName());
-		
+	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
-	private UserService userService = serviceFactory.getUserService();	
+	private BookService bookService = serviceFactory.getBookService();
 	BooksByCategoryCommand booksByCategoryCommand = BooksByCategoryCommand.getInstance();
-	
-	private LoginCommand() {}
-	
-	public static LoginCommand getInstance() {
+
+	private AddBookCommand() {
+	}
+
+	public static AddBookCommand getInstance() {
 		return INSTANCE;
 	}
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String targetResource = null;
-		String userName = request.getParameter(Constant.USER_NAME);
-		String password = request.getParameter(Constant.PASSWORD);
-		HttpSession session = request.getSession(false);
-		String language = (String)session.getAttribute(Constant.LANGUAGE);
+		Map<String, Object> requestParameters = 
+				ParameterProvider.getMapFromRequestParameters(request);
 		try {
-			User user = userService.validateGetUser(userName, password, language);
-			session.setAttribute(Constant.USER, user);
+			bookService.addBook(requestParameters);
 			booksByCategoryCommand.execute(request, response);
 		} catch (ServiceException e) {
 			LOG.log(Level.ERROR, e);
 			request.setAttribute(Constant.ERROR, e.getLocalizedMessage());
-			targetResource = Constant.HOME_JSP;
+			targetResource = Constant.ADD_BOOK_JSP;
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
 			requestDispatcher.forward(request, response);
 		}

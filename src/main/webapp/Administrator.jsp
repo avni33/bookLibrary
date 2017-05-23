@@ -22,14 +22,17 @@ table, th, td {
 	border: 1px solid black;
 	cellpadding: 10;
 }
+
 .hoverClass:hover {
-cursor: pointer;
-background-color: #f4e1d2;
-color : #674d3c;
+	cursor: pointer;
+	background-color: #f4e1d2;
+	color: #674d3c;
 }
+
 td {
-color : #4040a1;
+	color: #4040a1;
 }
+
 .error {
 	color: #D8000C;
 	background-color: #FFBABA;
@@ -38,12 +41,13 @@ color : #4040a1;
 	vertical-align: middle;
 }
 </style>
+
 </head>
-<body>
+<body onkeydown="return (event.keyCode != 116)">
 	<c:if test="${empty user or user.role.role ne 'administrator'}">
 		<c:redirect url="Home.jsp" />
 	</c:if>
-		<c:if test="${empty command or command == 'login'}">
+	<c:if test="${empty command or command == 'login' || command == 'addBook'}">
 		<c:set var="command" value="categoryChange" />
 	</c:if>
 	<c:if test="${command == 'changeLanguage'}">
@@ -53,10 +57,11 @@ color : #4040a1;
 		<c:set var="category" value="all" />
 	</c:if>
 	<form style="float: right;" action="Controller" method="get">
-		<input type="hidden" name="previousCmd" value="${command }" />
-		<input type="hidden" name="command" value="changeLanguage" /> <input
+		<input type="hidden" name="previousCmd" value="${command }" /> <input
+			type="hidden" name="command" value="changeLanguage" /> <input
 			type="hidden" name="category" value="${category }" />
-			<input type = "hidden" name = "searchText" value = "${param.searchText }"/> <select
+			 <input
+			type="hidden" name="searchText" value="${param.searchText }" /> <select
 			id="language" name="language" onchange="submit()">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
@@ -75,7 +80,8 @@ color : #4040a1;
 		<fmt:message key="text.button.search" var="searchButton" />
 		<input type="submit" value="${searchButton }" />
 	</form>
-	<br><br>
+	<br>
+	<br>
 	<form action="Controller" method="get">
 		<input type="hidden" name="command" value="categoryChange" /> <select
 			id="category" name="category" onchange="submit()">
@@ -101,12 +107,14 @@ color : #4040a1;
 						<th><fmt:message key="text.table.author" /></th>
 						<th><fmt:message key="text.table.price" /></th>
 						<th><fmt:message key="text.table.category" /></th>
+						<th><fmt:message key="text.button.edit" /></th>
 					</tr>
 					<c:set var="srNo" value="1" scope="session"></c:set>
 					<c:forEach items="${books}" var="book">
 						<form id="bookForm${book.id }" method="get" action="Controller">
 							<input type="hidden" name="command" value="bookFromId" /> <input
 								type="hidden" name="id" value="${book.id }" />
+								<input type = "hidden" name = "targetPage" value = "view"/>
 							<tr
 								onclick="document.getElementById('bookForm${book.id}').submit();"
 								class="hoverClass">
@@ -124,8 +132,19 @@ color : #4040a1;
 									<td><fmt:message key="text.table.ebook" /></td>
 								</c:if>
 								<c:set var="srNo" value="${srNo + 1 }" scope="request"></c:set>
-							</tr>
+								</form>
+								<td>
+						<form action = "Controller" method = "get">
+							<input type="hidden" name="command" value="bookFromId" />
+							<input type = "hidden" name = "targetPage" value = "edit"/>
+							<input type = "hidden" name = "id" value = "${book.id }"/>
+							<fmt:message key="text.button.edit" var="editbuttonValue" />
+							<input type="submit" value="${editbuttonValue }" />
 						</form>
+						</td>
+							</tr>
+						
+						
 					</c:forEach>
 				</tbody>
 			</table>
@@ -138,6 +157,19 @@ color : #4040a1;
 		</c:otherwise>
 	</c:choose>
 
+	<br>
+	<br>
+	<br>
+	<form id="categoryForm" action="AddBook.jsp">
+		<select id="categoryBook" name="categoryBook" onchange="submit()">
+			<option selected style="display: none"><fmt:message
+					key="text.button.addBook" /></option>
+			<option value="paper" ${categoryBook == 'paper' ? 'selected' : ''}><fmt:message
+					key="text.option.paperbook" /></option>
+			<option value="ebook" ${categoryBook == 'ebook' ? 'selected' : ''}><fmt:message
+					key="text.option.ebook" /></option>
+		</select>
+	</form>
 
 	<br>
 	<br>

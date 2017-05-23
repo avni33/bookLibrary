@@ -7,7 +7,11 @@ public enum CommandEnum {
 	GET_BOOKS_BY_CATEGORY("categoryChange"),
 	GET_BOOK_FROM_ID("bookFromId"),
 	SEARCH_BOOK("searchBook"),
-	LANGUAGE_CHANGE("changeLanguage");
+	LANGUAGE_CHANGE("changeLanguage"),
+	REGISTER("register"),
+	ADD_BOOK("addBook"),
+	EDIT_BOOK("editBook"),
+	EDIT_USER("editUser");
 	
 	private String command;
 	

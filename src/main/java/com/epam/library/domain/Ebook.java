@@ -60,9 +60,4 @@ public class Ebook extends Book {
 				+ getPrice() + ", PublishYear=" + getPublishYear() + "fileFormat=" + fileFormat + "]";
 	}
 	
-	@Override
-	public Ebook getBook() {
-		return this;
-	}
-	
 }

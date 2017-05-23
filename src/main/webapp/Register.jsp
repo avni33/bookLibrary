@@ -12,7 +12,7 @@
 <html lang="${language }">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Home Page</title>
+<title>Registration Page</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
 body {
@@ -27,16 +27,15 @@ body {
 	vertical-align: middle;
 }
 </style>
-
 </head>
 <body onkeydown="return (event.keyCode != 116)">
-	<c:if test="${not empty user and user.role.role eq 'administrator'}">
+<c:if test="${not empty user and user.role.role eq 'administrator'}">
 		<c:redirect url="Administrator.jsp" />
 	</c:if>
 	<c:if test="${not empty user and user.role.role eq 'user'}">
 		<c:redirect url="User.jsp" />
 	</c:if>
-	<form id="langForm" style="float: right;" action="Home.jsp">
+	<form id="langForm" style="float: right;" action="Register.jsp">
 		<select id="language" name="language" onchange="submit();">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
@@ -46,9 +45,9 @@ body {
 	<div class="container">
 
 		<section id="content">
-		<form name="loginForm" action="Controller" method="post">
+		<form name="registerForm" action="Controller" method="post">
 			<h1>
-				<fmt:message key="text.header.welcome" />
+				<fmt:message key="text.header.register" />
 			</h1>
 
 			<div>
@@ -61,21 +60,26 @@ body {
 					placeholder="<fmt:message key="text.label.password" />" required=""
 					name="password" />
 			</div>
-			<input type="hidden" name="command" value="login" /> <input
-				type="hidden" name="category" value="all" />
 			<div>
-				<fmt:message key="text.button.login" var="buttonValue" />
+				<input type="text"
+					placeholder="<fmt:message key="text.label.name" />" required=""
+					name="name" />
+			</div>
+			<input type="hidden" name="command" value="register" /> 
+			<div>
+				<fmt:message key="text.button.register" var="buttonValue" />
 
 				<input type="submit" value="${buttonValue }" /> 
 			</div>
 		</form>
-		<!-- form --> <c:if
-			test="${not empty error and error == 'Enter username'}">
+		 <c:if
+			test="${error == 'user exist'}">
 			<div class="error">
-				<fmt:message key="text.error.usernameError" />
+			<fmt:message key="text.error.exist" />
+				<%-- <fmt:message key="text.error.usernameError" /> --%>
 				<br> <br>
 			</div>
-		</c:if> <c:if test="${not empty error and error == 'Enter password' }">
+		 </c:if> <%-- <c:if test="${not empty error and error == 'Enter password' }">
 			<div class="error">
 				<fmt:message key="text.error.passwordError" />
 				<br> <br>
@@ -85,13 +89,12 @@ body {
 				<fmt:message key="text.error.user" />
 				<br> <br>
 			</div>
-		</c:if>
+		</c:if> --%>
 		<div class="button">
-			<a href="Register.jsp"><fmt:message key="text.button.register" /></a>
+			<a href="Home.jsp"><fmt:message key="text.button.login" /></a>
 		</div>
 		<!-- button --> </section>
 		<!-- content -->
 	</div>
-
 </body>
 </html>

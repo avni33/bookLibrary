@@ -8,5 +8,9 @@ public interface UserService {
 	User validateGetUser(String userName, String password, String language) throws ServiceException;
 	
 	User getUserFromId(User user, String language) throws ServiceException;
+	
+	boolean registerUser(String userName, String password, String name) throws ServiceException; 
+	
+	boolean editUser(User user, String language) throws ServiceException;
 
 }

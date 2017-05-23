@@ -74,6 +74,27 @@ public class MySQLConnectionPool {
 			throw new DAOException("Problem while closing all connections", e);
 		}
 	}
+	
+	public static void rollBackAndSetAutoCommit(Connection connection) throws DAOException {
+		try {
+			connection.rollback();
+	        connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			throw new DAOException(
+					"Issue with DB parameters while "
+					+ "rolling back inserting book.", e);
+		}
+	}
+	
+	public static void setAutoCommit(Connection connection) throws DAOException {
+		try {
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			throw new DAOException(
+					"Issue with DB parameters while "
+					+ "setting auto commit.", e);
+		}
+	}
 
 	private void loadDriver() {
 		try {

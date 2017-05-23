@@ -14,7 +14,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Error Details</title>
 </head>
-<body>
+<body onkeydown="return (event.keyCode != 116)">
 	<form style="float: right;">
 		<select id="language" name="language" onchange="submit()">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
