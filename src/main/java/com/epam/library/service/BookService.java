@@ -17,5 +17,7 @@ public interface BookService {
 	boolean addBook(Map<String, Object> requestParameters) throws ServiceException;
 	
 	boolean editBook(Map<String, Object> requestParameters, String language) throws ServiceException;
+	
+	List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language) throws ServiceException;
 
 }

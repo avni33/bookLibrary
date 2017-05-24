@@ -8,6 +8,7 @@ import com.epam.library.command.impl.BooksByCategoryCommand;
 import com.epam.library.command.impl.ChangeLanguageCommand;
 import com.epam.library.command.impl.EditBookCommand;
 import com.epam.library.command.impl.EditUserCommand;
+import com.epam.library.command.impl.FilterBookCommand;
 import com.epam.library.command.impl.GetBookFromIdCommand;
 import com.epam.library.command.impl.LoginCommand;
 import com.epam.library.command.impl.LogoutCommand;
@@ -41,6 +42,8 @@ public class CommandProvider {
 				EditBookCommand.getInstance());
 		commandMap.put(CommandEnum.EDIT_USER.toString(), 
 				EditUserCommand.getInstance());
+		commandMap.put(CommandEnum.FILTER_BOOK.toString(), 
+				FilterBookCommand.getInstance());
 	}
 	
 	public static final CommandProvider getInstance() {

@@ -2,6 +2,7 @@ package com.epam.library.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ public class BookServiceImpl implements BookService {
 	private static final BookServiceImpl INSTANCE = new BookServiceImpl();
 	
 	private static final String PAPER = "paper";
+	private static final String EMPTY_STRING = "";
 	
 	private DAOFactory daoFactory = DAOFactory.getInstance();
 	private BookDAO bookDAO = daoFactory.getBookDao();
@@ -117,6 +119,31 @@ public class BookServiceImpl implements BookService {
 			throw new ServiceException(e);
 		}
 		return bookEdited;
+	}
+
+	@Override
+	public List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language)
+			throws ServiceException {
+		List<Book> books = new ArrayList<Book>();
+		Map<String, String> newFilterParameters = replaceNullValuesWithEmptyString(filterParameters);
+		try {
+			books = bookDAO.getFilteredBooks(newFilterParameters, language);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		ResultChecker.checkBooksList(books);
+		return books;
+	}
+	
+	private Map<String, String> replaceNullValuesWithEmptyString(Map<String, Object> filterParameters) {
+		Map<String, String> newFilterParameters = new HashMap<String, String>();
+		for(Map.Entry<String, Object> entry : filterParameters.entrySet()) {
+			if(entry.getValue() == null) {
+				entry.setValue(EMPTY_STRING);
+			}
+			newFilterParameters.put(entry.getKey(), (String) entry.getValue());
+		}
+		return newFilterParameters;
 	}
 
 }

@@ -114,7 +114,7 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		} finally {
 			MySQLConnectionPool.returnConnectionToPool(connection);
 		}
-		if(!language.equals(DEFAULT_LANGUAGE) && name.equals(user.getName())) {
+		if(!DEFAULT_LANGUAGE.equals(language) && name.equals(user.getName())) {
 			user = getUserWithChangedLanguage(user, DEFAULT_LANGUAGE);
 		}
 		return user;

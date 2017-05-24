@@ -30,6 +30,7 @@ public final class Constant {
 	public static final String PAGES = "noOfPages";
 	public static final String FILE_FORMAT = "fileFormat";
 	public static final String BOOK_ID = "id";
+	public static final String BOOKS = "books";
 	
 	private Constant() {}
 

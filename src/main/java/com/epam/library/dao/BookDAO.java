@@ -1,6 +1,7 @@
 package com.epam.library.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.epam.library.dao.exception.DAOException;
 import com.epam.library.domain.Book;
@@ -16,5 +17,7 @@ public interface BookDAO {
 	boolean insertBook(Book book, String category) throws DAOException;
 	
 	boolean editBook(Book book, String category, String language) throws DAOException;
+	
+	List<Book> getFilteredBooks(Map<String, String> filterParameters, String language) throws DAOException;
 
 }

@@ -11,7 +11,8 @@ public enum CommandEnum {
 	REGISTER("register"),
 	ADD_BOOK("addBook"),
 	EDIT_BOOK("editBook"),
-	EDIT_USER("editUser");
+	EDIT_USER("editUser"),
+	FILTER_BOOK("filterBook");
 	
 	private String command;
 	

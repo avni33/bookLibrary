@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.epam.library.command.Constant;
 import com.epam.library.dao.BookDAO;
 import com.epam.library.dao.FieldName;
 import com.epam.library.dao.SqlQueryProvider;
@@ -59,6 +60,19 @@ public class BookDAOImpl implements BookDAO {
 	private static final String SQL_GET_ID_FOR_BOOK_TRANSLATION = 
 			"select b_id from book join book_translation on b_id "
 			+ "= bt_book where b_id = ? and bt_language_code = ?";
+	private static final String SQL_GET_FILTERED_BOOKS = 
+			"select b_id, bt_title, bt_author, bt_description, b_price_usd,"
+			+ " b_publish_year, pb_pages, ebt_file_format, pbt_cover,"
+			+ " bt_language_code from book left join paper_book on "
+			+ "b_id=pb_id left join e_book_translation on b_id = ebt_id"
+			+ " join book_translation on b_id=bt_book left join paper_book_translation"
+			+ " on pb_id=pbt_paper_book where (pbt_language_code = ? or "
+			+ "ebt_language_code = ?) and  bt_title like ? and bt_author like"
+			+ " ? and bt_description like ? and b_price_usd like ? and "
+			+ "b_publish_year like ? and (pb_pages like ? or pb_pages is"
+			+ " null) and (pbt_cover like ? or pbt_cover is null) and "
+			+ "(ebt_file_format like ? or ebt_file_format is null) "
+			+ "having bt_language_code = ?";
 	
 	private static final int ONE = 1;
 	private static final int TWO = 2;
@@ -69,6 +83,8 @@ public class BookDAOImpl implements BookDAO {
 	private static final int SEVEN = 7;
 	private static final int EIGHT = 8;
 	private static final int NINE = 9;
+	private static final int TEN = 10;
+	private static final int ELEVEN = 11;
 	private static final String PERCENT = "%";
 	private static final String DEFAULT_LANGUAGE = "en";
 	private static final String PAPER = "paper";
@@ -491,6 +507,45 @@ public class BookDAOImpl implements BookDAO {
 		CallableStatement statement = connection.prepareCall(
 				SQL_UPDATE_TRANSLATE_EBOOK);
 		statement = setParametersForEbook(statement, ebook, language);
+		return statement;
+	}
+
+	@Override
+	public List<Book> getFilteredBooks(Map<String, String> filterParameters, String language) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		List<Book> books = new ArrayList<Book>();
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForFilteredBooks(connection, language, filterParameters);
+				ResultSet set = statement.executeQuery();) {
+			while (set.next()) {
+				books.add(getBookFromResultSet(set));
+			}
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "getting filtered books.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return books;
+	}
+
+	private PreparedStatement createPreparedStatementForFilteredBooks
+	(Connection connection, String language,
+			Map<String, String> filterParameters) throws SQLException {
+		PreparedStatement statement = 
+				connection.prepareStatement(SQL_GET_FILTERED_BOOKS);
+		statement.setString(ONE, language);
+		statement.setString(TWO, language);
+		statement.setString(THREE, PERCENT + filterParameters.get(Constant.TITLE) + PERCENT);
+		statement.setString(FOUR, PERCENT + filterParameters.get(Constant.AUTHOR) + PERCENT);
+		statement.setString(FIVE, PERCENT + filterParameters.get(Constant.DESCRIPTION) + PERCENT);
+		statement.setString(SIX, PERCENT + filterParameters.get(Constant.PRICE) + PERCENT);
+		statement.setString(SEVEN, PERCENT + filterParameters.get(Constant.PUBLISH_YEAR) + PERCENT);
+		statement.setString(EIGHT, PERCENT + filterParameters.get(Constant.PAGES) + PERCENT);
+		statement.setString(NINE, PERCENT + filterParameters.get(Constant.COVER_TYPE) + PERCENT);
+		statement.setString(TEN, PERCENT + filterParameters.get(Constant.FILE_FORMAT) + PERCENT);
+		statement.setString(ELEVEN, language);
 		return statement;
 	}
 
