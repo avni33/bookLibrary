@@ -13,6 +13,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Administrator Page</title>
+<link rel="stylesheet" href="css/table.css">
 <style>
 body {
 	text-align: center;
