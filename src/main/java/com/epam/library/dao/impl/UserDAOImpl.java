@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.epam.library.dao.FieldName;
 import com.epam.library.dao.UserDAO;
@@ -18,11 +20,11 @@ public class UserDAOImpl implements UserDAO {
 private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	
 	private static final String SQL_GET_USER 
-	= "select u_id, r_role, r_id, ut_name from user join role on u_role = "
+	= "select u_id, u_username, r_role, r_id, ut_name from user join role on u_role = "
 			+ "r_id join user_translation on u_id = ut_user where "
 			+ "u_username = ? and u_password = ? and ut_language_code = ?";
 	private static final String SQL_GET_USER_FROM_ID 
-	= "select u_id, r_role, r_id, ut_name from user join role"
+	= "select u_id, u_username, r_role, r_id, ut_name from user join role"
 			+ " on u_role = r_id join user_translation on"
 			+ " u_id = ut_user where u_id = ? and ut_language_code = ?";
 	private static final String SQL_GET_ID_FROM_USER_NAME 
@@ -36,6 +38,8 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	private static final String SQL_GET_ID_FOR_USER_TRANSLATION = 
 			"select ut_user from user_translation where ut_user = ? "
 			+ "and ut_language_code = ?";
+	private static final String SQL_GET_ALL_USER_IDS = 
+	"select u_id from user where u_role = 1";
 	private static final int ONE = 1;
 	private static final int TWO = 2;
 	private static final int THREE = 3;
@@ -85,6 +89,7 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		role.setId(set.getInt(FieldName.ROLE_ID.toString()));
 		role.setRole(set.getString(FieldName.ROLE.toString()));
 		user.setRole(role);
+		user.setUserName(set.getString(FieldName.USERNAME.toString()));
 		user.setName(set.getString(FieldName.NAME.toString()));
 		user.setId(set.getInt(FieldName.USER_ID.toString()));
 		return user;
@@ -99,7 +104,17 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	@Override
 	public User getUserWithChangedLanguage(User user, String language) throws DAOException {
 		String name = user.getName();
+		user = getUserFromId(user.getId(), language);
+		if(!DEFAULT_LANGUAGE.equals(language) && name.equals(user.getName())) {
+			user = getUserWithChangedLanguage(user, DEFAULT_LANGUAGE);
+		}
+		return user;
+	}
+	
+	private User getUserFromId(int userId, String language) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
+		User user = new User();
+		user.setId(userId);
 		checkConnection(connection);
 		try(PreparedStatement statement = 
 				createPreparedStatementForUserFromId(connection, user, language);
@@ -113,9 +128,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 					+ "getting user.", se);
 		} finally {
 			MySQLConnectionPool.returnConnectionToPool(connection);
-		}
-		if(!DEFAULT_LANGUAGE.equals(language) && name.equals(user.getName())) {
-			user = getUserWithChangedLanguage(user, DEFAULT_LANGUAGE);
 		}
 		return user;
 	}
@@ -307,6 +319,49 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		CallableStatement statement = connection.prepareCall(SQL_UPDATE_TRANSLATE_USER);
 		statement = setParameters(statement, user, language);
 		return statement;
+	}
+
+	@Override
+	public List<User> getAllUsers(String language) throws DAOException {
+		List<Integer> userIds = getUserIds();
+		List<User> users = new ArrayList<User>();
+		for(Integer id : userIds) {
+			User user = getUserFromId(id, language);
+			if(user.getName() == null) {
+				user = getUserFromId(id, DEFAULT_LANGUAGE);
+			}
+			users.add(user);
+		}
+		return users;
+	}
+
+	@Override
+	public List<Integer> getUserIds() throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		checkConnection(connection);
+		List<Integer> userIds = new ArrayList<Integer>();
+		try(PreparedStatement statement = connection.prepareStatement(SQL_GET_ALL_USER_IDS);
+				ResultSet set = statement.executeQuery();) {
+			while (set.next()) {
+				userIds.add(set.getInt(FieldName.USER_ID.toString()));
+			}
+		} catch (SQLException se) {
+			throw new DAOException(
+					"Issue with DB parameters while "
+					+ "getting user ids.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return userIds;
+	}
+
+	@Override
+	public User getUserById(int userId, String language) throws DAOException {
+		User user = getUserFromId(userId, language);
+		if(user.getName() == null) {
+			user = getUserFromId(userId, DEFAULT_LANGUAGE);
+		}
+		return user;
 	}
 	
 	/*private boolean checkIfInserted(int rows) {

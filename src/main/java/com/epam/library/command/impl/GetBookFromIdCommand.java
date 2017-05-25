@@ -34,6 +34,8 @@ public class GetBookFromIdCommand implements Command {
 	private static final String BOOK = "book";
 	private static final String TARGET_PAGE = "targetPage";
 	private static final String EDIT = "edit";
+	private static final String RATING = "avgrating";
+	private static final String USER_RATING = "rating";
 	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
 	private BookService bookService = serviceFactory.getBookService();
@@ -56,6 +58,10 @@ public class GetBookFromIdCommand implements Command {
 		try {
 			Book book = bookService.getBookFromId(language, bookId);
 			putBookInRequest(book, request);
+			float rating = bookService.getRating(bookId);
+			request.setAttribute(RATING, rating);
+			int userRating = bookService.getUserRating(user.getId(), bookId);
+			request.setAttribute(USER_RATING, userRating);
 			if(EDIT.equals(targetPage)) {
 				targetResource = Constant.EDIT_BOOK_JSP;
 			} else {

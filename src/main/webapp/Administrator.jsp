@@ -51,6 +51,9 @@ td {
 	<c:if test="${empty command or command == 'login' || command == 'addBook'}">
 		<c:set var="command" value="categoryChange" />
 	</c:if>
+		<c:if test="${command == 'editUser'}">
+		<c:set var="command" value="categoryChange" />
+	</c:if>
 	<c:if test="${command == 'changeLanguage'}">
 		<c:set var="command" value="${param.previousCmd }" />
 	</c:if>
@@ -78,21 +81,34 @@ td {
 		</select>
 	</form>
 	<h1>
+	<form action = "Controller" method = "get" style = "float : left;">
+	<input type = "hidden" name = "command" value = "getUsers"/>
+	<fmt:message key="text.admin.users" var="userButton" />
+	<input type = "submit" value = "${userButton }"/>
+	</form>
 	<fmt:message key="text.header.hello" />
 		,
 		<fmt:message key="text.header.user" />
 		<c:out value="${user.name }"></c:out>
-	</h1>
-	<br>
-	<br>
-	<form id="searchForm" action=Controller method="get">
+		<form id="searchForm" action="Controller" method="get" style = "float : right;">
 		<input type="hidden" name="command" value="searchBook" /> <input
 			type="text" name="searchText" />
 		<fmt:message key="text.button.search" var="searchButton" />
 		<input type="submit" value="${searchButton }" />
 	</form>
-	<br><br>
+	</h1>
+
 	<h1>
+	<form id="categoryForm" action="AddBook.jsp" style = "float:left;">
+		<select id="categoryBook" name="categoryBook" onchange="submit()">
+			<option selected style="display: none"><fmt:message
+					key="text.button.addBook" /></option>
+			<option value="paper" ${categoryBook == 'paper' ? 'selected' : ''}><fmt:message
+					key="text.option.paperbook" /></option>
+			<option value="ebook" ${categoryBook == 'ebook' ? 'selected' : ''}><fmt:message
+					key="text.option.ebook" /></option>
+		</select>
+	</form>
 	<form id="filterForm" action="Controller" method="get">
 		<input type="hidden" name="command" value="filterBook" placeholder="<fmt:message key="text.book.author" />" /> 
 		        <input type="text" name="title" placeholder="<fmt:message key="text.heading.title" />" />
@@ -107,7 +123,6 @@ td {
 		&nbsp;<input type="submit" value="${filterButton }" />
 	</form>
 	</h1>
-	<br><br>
 	<form action="Controller" method="get">
 		<input type="hidden" name="command" value="categoryChange" /> <select
 			id="category" name="category" onchange="submit()">
@@ -124,7 +139,7 @@ td {
 	<br>
 	<br>
 	<c:choose>
-		<c:when test="${empty error }">
+		<c:when test="${empty error}">
 			<table align="center">
 				<tbody>
 					<tr>
@@ -185,21 +200,7 @@ td {
 
 	<br>
 	<br>
-	<br>
-	<form id="categoryForm" action="AddBook.jsp">
-		<select id="categoryBook" name="categoryBook" onchange="submit()">
-			<option selected style="display: none"><fmt:message
-					key="text.button.addBook" /></option>
-			<option value="paper" ${categoryBook == 'paper' ? 'selected' : ''}><fmt:message
-					key="text.option.paperbook" /></option>
-			<option value="ebook" ${categoryBook == 'ebook' ? 'selected' : ''}><fmt:message
-					key="text.option.ebook" /></option>
-		</select>
-	</form>
 
-	<br>
-	<br>
-	<br>
 	<form name="logoutForm" action="Controller" method="post">
 		<input type="hidden" name="command" value="logout" />
 		<fmt:message key="text.button.logout" var="buttonValue" />

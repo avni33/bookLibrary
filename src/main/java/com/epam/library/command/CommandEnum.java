@@ -12,7 +12,11 @@ public enum CommandEnum {
 	ADD_BOOK("addBook"),
 	EDIT_BOOK("editBook"),
 	EDIT_USER("editUser"),
-	FILTER_BOOK("filterBook");
+	FILTER_BOOK("filterBook"),
+	RATE_BOOK("rateBook"),
+	BORROW_BOOK("borrowBook"),
+	GET_USERS("getUsers"),
+	USER_FROM_ID("userFromId");
 	
 	private String command;
 	

@@ -2,6 +2,7 @@ package com.epam.library.dao.impl;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -20,6 +21,7 @@ import com.epam.library.dao.builder.BuilderFactory;
 import com.epam.library.dao.connection.pool.MySQLConnectionPool;
 import com.epam.library.dao.exception.DAOException;
 import com.epam.library.domain.Book;
+import com.epam.library.domain.BorrowedBook;
 import com.epam.library.domain.Ebook;
 import com.epam.library.domain.PaperBook;
 
@@ -73,7 +75,17 @@ public class BookDAOImpl implements BookDAO {
 			+ " null) and (pbt_cover like ? or pbt_cover is null) and "
 			+ "(ebt_file_format like ? or ebt_file_format is null) "
 			+ "having bt_language_code = ?";
-	
+	private static final String SQL_RATE_BOOK = 
+			"{ call insert_update_rating(?,?,?) }";
+	private static final String SQL_GET_RATING = 
+			"select avg(r_rating) as rate from rating where r_book = ?";
+	private static final String SQL_GET_USER_RATING = 
+			"select r_rating from rating where r_user = ? and r_book = ?";
+	private static final String SQL_GET_BORROWED_BOOK_ID = 
+			"select bb_id from book_borrow where bb_user = ? and bb_book = ?";
+	private static final String SQL_INSERT_BORROWED_BOOK = 
+			"INSERT INTO `book_borrow` (`bb_user`, `bb_book`, `bb_borrow_date`,"
+			+ " `bb_return_date`, `bb_returned`) VALUES (?,?,?,?,?)";
 	private static final int ONE = 1;
 	private static final int TWO = 2;
 	private static final int THREE = 3;
@@ -546,6 +558,151 @@ public class BookDAOImpl implements BookDAO {
 		statement.setString(NINE, PERCENT + filterParameters.get(Constant.COVER_TYPE) + PERCENT);
 		statement.setString(TEN, PERCENT + filterParameters.get(Constant.FILE_FORMAT) + PERCENT);
 		statement.setString(ELEVEN, language);
+		return statement;
+	}
+
+	@Override
+	public boolean rateBook(int userId, int bookId, int rating) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		boolean ratingDone = true;
+		checkConnection(connection);
+		try (CallableStatement statement = 
+				getCallableStatementForRating(userId, bookId, rating, connection);) {
+			statement.execute();
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "rating books.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return ratingDone;
+	}
+	
+	private CallableStatement getCallableStatementForRating(
+			int userId, int bookId, int rating, Connection connection) throws SQLException {
+		CallableStatement statement = connection.prepareCall(SQL_RATE_BOOK);
+		statement.setInt(ONE, userId);
+		statement.setInt(TWO, bookId);
+		statement.setInt(THREE, rating);
+		return statement;
+	}
+
+	@Override
+	public float getRating(int bookId) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		float rating = 0;
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForGettingRating(connection, bookId);
+				ResultSet set = statement.executeQuery();) {
+			while (set.next()) {
+				rating = set.getFloat(FieldName.RATE.toString());
+			}
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "getting rating.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return rating;
+	}
+	
+	private PreparedStatement createPreparedStatementForGettingRating
+	(Connection connection, int bookId)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_GET_RATING);
+		statement.setInt(ONE, bookId);
+		return statement;
+	}
+
+	@Override
+	public int getUserRating(int userId, int bookId) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		int userRating = 0;
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForGettingUserRating(connection, bookId, userId);
+				ResultSet set = statement.executeQuery();) {
+			while (set.next()) {
+				userRating = set.getInt(FieldName.RATING.toString());
+			}
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "getting user rating.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return userRating;
+	}
+	
+	private PreparedStatement createPreparedStatementForGettingUserRating
+	(Connection connection, int bookId, int userId)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_GET_USER_RATING);
+		statement.setInt(ONE, userId);
+		statement.setInt(TWO, bookId);
+		return statement;
+	}
+
+	@Override
+	public boolean checkIfUserHasBorrowedBook(int userId, int bookId) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		boolean userBorrowedBook = false;
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForBorrowedBookId(connection, bookId, userId);
+				ResultSet set = statement.executeQuery();) {
+			if(set.next()) {
+				userBorrowedBook = true;
+			}
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "getting borrowed book id.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return userBorrowedBook;
+	}
+	
+	private PreparedStatement createPreparedStatementForBorrowedBookId
+	(Connection connection, int bookId, int userId)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_GET_BORROWED_BOOK_ID);
+		statement.setInt(ONE, userId);
+		statement.setInt(TWO, bookId);
+		return statement;
+	}
+
+	@Override
+	public boolean insertBorrowedBook(BorrowedBook borrowedBook) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		boolean inserted = true;
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForInsertingBorrowedBook(connection, borrowedBook);) {
+			statement.executeUpdate();
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "inserting borrowed book.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return inserted;
+	}
+	
+	private PreparedStatement createPreparedStatementForInsertingBorrowedBook
+	(Connection connection, BorrowedBook borrowedBook)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_INSERT_BORROWED_BOOK);
+		statement.setInt(ONE, borrowedBook.getUserId());
+		statement.setInt(TWO, borrowedBook.getBookId());
+		statement.setDate(THREE, Date.valueOf(borrowedBook.getBorrowedDate()));
+		statement.setDate(FOUR, Date.valueOf(borrowedBook.getReturnDate()));
+		statement.setBoolean(FIVE, borrowedBook.isReturnedBook());
 		return statement;
 	}
 

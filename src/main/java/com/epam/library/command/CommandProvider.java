@@ -5,13 +5,17 @@ import java.util.Map;
 
 import com.epam.library.command.impl.AddBookCommand;
 import com.epam.library.command.impl.BooksByCategoryCommand;
+import com.epam.library.command.impl.BorrowBookCommand;
 import com.epam.library.command.impl.ChangeLanguageCommand;
 import com.epam.library.command.impl.EditBookCommand;
 import com.epam.library.command.impl.EditUserCommand;
 import com.epam.library.command.impl.FilterBookCommand;
 import com.epam.library.command.impl.GetBookFromIdCommand;
+import com.epam.library.command.impl.GetUserFromIdCommand;
+import com.epam.library.command.impl.GetUsersCommand;
 import com.epam.library.command.impl.LoginCommand;
 import com.epam.library.command.impl.LogoutCommand;
+import com.epam.library.command.impl.RateBookCommand;
 import com.epam.library.command.impl.RegisterCommand;
 import com.epam.library.command.impl.SearchBookCommand;
 
@@ -44,6 +48,14 @@ public class CommandProvider {
 				EditUserCommand.getInstance());
 		commandMap.put(CommandEnum.FILTER_BOOK.toString(), 
 				FilterBookCommand.getInstance());
+		commandMap.put(CommandEnum.RATE_BOOK.toString(), 
+				RateBookCommand.getInstance());
+		commandMap.put(CommandEnum.BORROW_BOOK.toString(), 
+				BorrowBookCommand.getInstance());
+		commandMap.put(CommandEnum.GET_USERS.toString(), 
+				GetUsersCommand.getInstance());
+		commandMap.put(CommandEnum.USER_FROM_ID.toString(), 
+				GetUserFromIdCommand.getInstance());
 	}
 	
 	public static final CommandProvider getInstance() {

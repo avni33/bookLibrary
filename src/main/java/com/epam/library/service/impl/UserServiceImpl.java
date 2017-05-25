@@ -1,7 +1,9 @@
 package com.epam.library.service.impl;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import com.epam.library.dao.DAOFactory;
 import com.epam.library.dao.UserDAO;
@@ -112,6 +114,28 @@ public class UserServiceImpl implements UserService {
 			throw new ServiceException(e);
 		}
 		return userEdited;
+	}
+
+	@Override
+	public List<User> getAllUsers(String language) throws ServiceException {
+		List<User> users = new ArrayList<User>();
+		try {
+			users = userDAO.getAllUsers(language);
+		} catch(DAOException e) {
+			throw new ServiceException(e);
+		}
+		return users;
+	}
+
+	@Override
+	public User getSelectedUser(int userId, String language) throws ServiceException {
+		User user = new User();
+		try {
+			user = userDAO.getUserById(userId, language);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return user;
 	}
 
 }

@@ -9,10 +9,12 @@ public final class Constant {
 	public static final String USER_JSP_FORWARD = "/User.jsp";
 	public static final String ADMINISTRATOR_JSP_FORWARD = "/Administrator.jsp";
 	public static final String BOOK_DETAIL_JSP = "/BookDetail.jsp";
+	public static final String USER_DETAILS_JSP = "/UserDetails.jsp";
 	public static final String EDIT_BOOK_JSP = "/EditBook.jsp";
 	public static final String EDIT_USER_JSP = "/EditUser.jsp";
 	public static final String REGISTER_JSP = "/Register.jsp";
 	public static final String ADD_BOOK_JSP = "/AddBook.jsp";
+	public static final String USERS_LIST_JSP = "/UsersList.jsp";
 	public static final String USER = "user";
 	public static final String ERROR = "error";
 	public static final String LANGUAGE = "language";
@@ -31,6 +33,7 @@ public final class Constant {
 	public static final String FILE_FORMAT = "fileFormat";
 	public static final String BOOK_ID = "id";
 	public static final String BOOKS = "books";
+	public static final String USER_ID = "id";
 	
 	private Constant() {}
 

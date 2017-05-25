@@ -146,4 +146,37 @@ public class BookServiceImpl implements BookService {
 		return newFilterParameters;
 	}
 
+	@Override
+	public boolean rateBook(int userId, int bookId, int rating) throws ServiceException {
+		boolean ratingDone = false;
+		try {
+			ratingDone = bookDAO.rateBook(userId, bookId, rating);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return ratingDone;
+	}
+
+	@Override
+	public float getRating(int bookId) throws ServiceException {
+		float rating = 0;
+		try {
+			rating = bookDAO.getRating(bookId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return rating;
+	}
+
+	@Override
+	public int getUserRating(int userId, int bookId) throws ServiceException {
+		int rating = 0;
+		try {
+			rating = bookDAO.getUserRating(userId, bookId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return rating;
+	}
+
 }

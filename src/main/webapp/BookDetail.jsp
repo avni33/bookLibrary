@@ -31,17 +31,31 @@ td {
 tr:nth-child(even) {
 	background-color: #f2f2f2
 }
+.error {
+	color: #D8000C;
+	background-color: #FFBABA;
+	margin: 10px 22px;
+	font-size: 2em;
+	vertical-align: middle;
+}
+.success {
+	color: #4F8A10;
+background-color: #DFF2BF;
+	margin: 10px 22px;
+	font-size: 2em;
+	vertical-align: middle;
+}
 </style>
 </head>
 <body onkeydown="return (event.keyCode != 116)">
 	<c:if test="${empty user}">
 		<c:redirect url="Home.jsp" />
 	</c:if>
-	
-		<c:if test="${empty command or command == 'login'}">
+
+	<c:if test="${empty command or command == 'login'}">
 		<c:set var="command" value="categoryChange" />
 	</c:if>
-	<c:if test="${command == 'editBook'}">
+	<c:if test="${command == 'editBook' or command == 'rateBook' or command == 'borrowBook'}">
 		<c:set var="command" value="bookFromId" />
 	</c:if>
 	<c:if test="${command == 'changeLanguage'}">
@@ -51,17 +65,19 @@ tr:nth-child(even) {
 		<c:set var="category" value="all" />
 	</c:if>
 	<form style="float: right;" action="Controller" method="get">
-		<input type="hidden" name="previousCmd" value="${command }" />
-		<input type = "hidden" name = "targetPage" value = "${param.targetPage }"/>
-		<input type="hidden" name="command" value="changeLanguage" />
-			<input type = "hidden" name = "id" value = "${param.id }"/> <select
-			id="language" name="language" onchange="submit()">
+		<input type="hidden" name="previousCmd" value="${command }" /> <input
+			type="hidden" name="targetPage" value="${param.targetPage }" /> <input
+			type="hidden" name="command" value="changeLanguage" /> <input
+			type="hidden" name="id" value="${param.id }" /> <select id="language"
+			name="language" onchange="submit()">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
 			<option value="be" ${language == 'be' ? 'selected' : ''}>Belarusian</option>
 		</select>
 	</form>
-	<h1><fmt:message key="text.header.detais" /></h1>
+	<h1>
+		<fmt:message key="text.header.detais" />
+	</h1>
 	<table align="center">
 		<tr>
 			<td><fmt:message key="text.heading.id" /></td>
@@ -113,20 +129,82 @@ tr:nth-child(even) {
 				<td><c:out value="${book.fileFormat }" /></td>
 			</tr>
 		</c:if>
+		<tr>
+			<td><fmt:message key="text.heading.rating" /></td>
+			<c:choose>
+				<c:when test="${avgrating == 0 }">
+					<td><fmt:message key="text.rating.error" /></td>
+				</c:when>
+				<c:otherwise>
+					<td><c:out value="${avgrating }" /></td>
+				</c:otherwise>
+			</c:choose>
+		</tr>
 	</table>
-	<br><br>
-	<form action = "Controller" method = "get">
-							<input type="hidden" name="command" value="bookFromId" />
-							<input type = "hidden" name = "targetPage" value = "edit"/>
-							<input type = "hidden" name = "id" value = "${book.id }"/>
-							<fmt:message key="text.button.edit" var="editbuttonValue" />
-							<input type="submit" value="${editbuttonValue }" />
-						</form>
-	
-	<br><br><br>
-		<form name="backForm" action="Controller" method="get">
-		<input type="hidden" name="command" value="categoryChange" />
-		<input type="hidden" name="category" value="all" />
+	<br>
+	<br>
+	<c:choose>
+		<c:when test="${user.role.role == 'administrator' }">
+			<form action="Controller" method="get">
+				<input type="hidden" name="command" value="bookFromId" /> <input
+					type="hidden" name="targetPage" value="edit" /> <input
+					type="hidden" name="id" value="${book.id }" />
+				<fmt:message key="text.button.edit" var="editbuttonValue" />
+				<input type="submit" value="${editbuttonValue }" />
+			</form>
+			<br><br>
+			<c:if test="${book['class'] == 'class com.epam.library.domain.PaperBook' }">
+			<h1>
+			<form action="Controller" method="get">
+				<input type="hidden" name="command" value="borrowBook" /> <input
+					type="hidden" name="targetPage" value="view" /> <input
+					type="hidden" name="id" value="${book.id }" />
+					<fmt:message key="text.borrow.userId" /> <input type = "text" name = "userId" pattern="^[0-9]+$" required/>
+				<fmt:message key="text.borrow.button" var="borrowbuttonValue" />
+				<input type="submit" value="${borrowbuttonValue }" />
+			</form>
+			</h1>
+			</c:if>
+			<c:if test = "${bookBorrowed == false }">
+			<div class="error">
+				<fmt:message key="text.borrow.error" />
+				<br> <br>
+			</div>
+			</c:if>
+			<c:if test = "${bookBorrowed == true }">
+			<div class="success">
+				<fmt:message key="text.borrow.success" />
+				<br> <br>
+			</div>
+			</c:if>
+		</c:when>
+		<c:otherwise>
+		<form name = "rateForm" action = "Controller" method = "get">
+<div class = "stars"><fieldset class="rating">
+    <legend><fmt:message key="text.rating.rate" />:</legend>
+    <input type = "hidden" name = "command" value = "rateBook"/>
+    <input type = "hidden" name = "id" value = "${book.id }"/>
+    <input type = "hidden" name = "targetPage" value = "view"/>
+    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Rocks!" ${rating == 5 ? 'checked' : ''}></label>
+    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Pretty good" ${rating == 4 ? 'checked' : ''}></label>
+    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Meh" ${rating == 3 ? 'checked' : ''}></label>
+    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kinda bad" ${rating == 2 ? 'checked' : ''}></label>
+    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Sucks big time" ${rating == 1 ? 'checked' : ''}></label>
+    <br>
+
+</fieldset>
+<fmt:message key="text.rating.rating" var="ratebuttonValue" />
+  <input type = "submit" value = "${ratebuttonValue}"/>
+</div>
+</form>
+		</c:otherwise>
+	</c:choose>
+	<br>
+	<br>
+	<br>
+	<form name="backForm" action="Controller" method="get">
+		<input type="hidden" name="command" value="categoryChange" /> <input
+			type="hidden" name="category" value="all" />
 		<fmt:message key="text.button.back" var="buttonValue" />
 		<input type="submit" value="${buttonValue }" />
 	</form>

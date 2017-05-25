@@ -3,6 +3,7 @@ package com.epam.library.dao;
 public enum FieldName {
 	
 	USER_ID("u_id"),
+	USERNAME("u_username"),
 	NAME("ut_name"),
 	ROLE_ID("r_id"),
 	ROLE("r_role"),
@@ -14,7 +15,9 @@ public enum FieldName {
 	DESCRIPTION("bt_description"),
 	PAGES("pb_pages"),
 	COVER_TYPE("pbt_cover"),
-	FILE_FORMAT("ebt_file_format");
+	FILE_FORMAT("ebt_file_format"),
+	RATE("rate"),
+	RATING("r_rating");
 	
 	private String field;
 	
