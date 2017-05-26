@@ -1,5 +1,8 @@
 package com.epam.library.command;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum CommandEnum {
 	
 	LOGIN("login"),
@@ -22,12 +25,24 @@ public enum CommandEnum {
 	
 	private String command;
 	
+	private static final Map<String, CommandEnum> lookUp = new HashMap<String, CommandEnum>();
+	
+	  static {
+	        for (CommandEnum command : CommandEnum.values()) {
+	            lookUp.put(command.toString(), command);
+	        }
+	   }
+	
 	private CommandEnum(String command) {
 		this.command = command;
 	}
 	
 	public String toString() {
 		return this.command;
+	}
+	
+	public static CommandEnum getEnum(String value) {
+		return lookUp.get(value);
 	}
 
 }

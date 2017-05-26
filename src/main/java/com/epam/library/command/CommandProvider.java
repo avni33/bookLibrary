@@ -25,42 +25,42 @@ public class CommandProvider {
 	
 	private static final CommandProvider INSTANCE = new CommandProvider();
 	
-	private Map<String, Command> commandMap = new HashMap<String, Command>();
+	private Map<CommandEnum, Command> commandMap = new HashMap<CommandEnum, Command>();
 	
 	private CommandProvider() {
-		commandMap.put(CommandEnum.LOGIN.toString()
+		commandMap.put(CommandEnum.LOGIN
 				, LoginCommand.getInstance());
-		commandMap.put(CommandEnum.LOGOUT.toString()
+		commandMap.put(CommandEnum.LOGOUT
 				, LogoutCommand.getInstance());
-		commandMap.put(CommandEnum.GET_BOOKS_BY_CATEGORY.toString(), 
+		commandMap.put(CommandEnum.GET_BOOKS_BY_CATEGORY, 
 				BooksByCategoryCommand.getInstance());
-		commandMap.put(CommandEnum.GET_BOOK_FROM_ID.toString(), 
+		commandMap.put(CommandEnum.GET_BOOK_FROM_ID, 
 				GetBookFromIdCommand.getInstance());
-		commandMap.put(CommandEnum.SEARCH_BOOK.toString(), 
+		commandMap.put(CommandEnum.SEARCH_BOOK, 
 				SearchBookCommand.getInstance());
-		commandMap.put(CommandEnum.LANGUAGE_CHANGE.toString(), 
+		commandMap.put(CommandEnum.LANGUAGE_CHANGE, 
 				ChangeLanguageCommand.getInstance());
-		commandMap.put(CommandEnum.REGISTER.toString(), 
+		commandMap.put(CommandEnum.REGISTER, 
 				RegisterCommand.getInstance());
-		commandMap.put(CommandEnum.ADD_BOOK.toString(), 
+		commandMap.put(CommandEnum.ADD_BOOK, 
 				AddBookCommand.getInstance());
-		commandMap.put(CommandEnum.EDIT_BOOK.toString(), 
+		commandMap.put(CommandEnum.EDIT_BOOK, 
 				EditBookCommand.getInstance());
-		commandMap.put(CommandEnum.EDIT_USER.toString(), 
+		commandMap.put(CommandEnum.EDIT_USER, 
 				EditUserCommand.getInstance());
-		commandMap.put(CommandEnum.FILTER_BOOK.toString(), 
+		commandMap.put(CommandEnum.FILTER_BOOK, 
 				FilterBookCommand.getInstance());
-		commandMap.put(CommandEnum.RATE_BOOK.toString(), 
+		commandMap.put(CommandEnum.RATE_BOOK, 
 				RateBookCommand.getInstance());
-		commandMap.put(CommandEnum.BORROW_BOOK.toString(), 
+		commandMap.put(CommandEnum.BORROW_BOOK, 
 				BorrowBookCommand.getInstance());
-		commandMap.put(CommandEnum.GET_USERS.toString(), 
+		commandMap.put(CommandEnum.GET_USERS, 
 				GetUsersCommand.getInstance());
-		commandMap.put(CommandEnum.USER_FROM_ID.toString(), 
+		commandMap.put(CommandEnum.USER_FROM_ID, 
 				GetUserFromIdCommand.getInstance());
-		commandMap.put(CommandEnum.RETURN_BOOK.toString(), 
+		commandMap.put(CommandEnum.RETURN_BOOK, 
 				ReturnBookCommand.getInstance());
-		commandMap.put(CommandEnum.GET_BORROWED_BOOKS.toString(), 
+		commandMap.put(CommandEnum.GET_BORROWED_BOOKS, 
 				GetBorrowedBooks.getInstance());
 	}
 	
@@ -69,7 +69,8 @@ public class CommandProvider {
 	}
 	
 	public Command getCommand(String commandName) {
-		return commandMap.get(commandName);
+		CommandEnum command = CommandEnum.getEnum(commandName);
+		return commandMap.get(command);
 	}
 
 }
