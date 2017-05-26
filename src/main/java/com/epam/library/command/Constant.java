@@ -14,6 +14,7 @@ public final class Constant {
 	public static final String EDIT_USER_JSP = "/EditUser.jsp";
 	public static final String REGISTER_JSP = "/Register.jsp";
 	public static final String ADD_BOOK_JSP = "/AddBook.jsp";
+	public static final String BORROWED_BOOK_JSP = "/BorrowedBook.jsp";
 	public static final String USERS_LIST_JSP = "/UsersList.jsp";
 	public static final String USER = "user";
 	public static final String ERROR = "error";
@@ -27,6 +28,8 @@ public final class Constant {
 	public static final String AUTHOR = "author";
 	public static final String DESCRIPTION = "description";
 	public static final String PRICE = "price";
+	public static final String MIN_PRICE = "minprice";
+	public static final String MAX_PRICE = "maxprice";
 	public static final String PUBLISH_YEAR = "publishYear";
 	public static final String COVER_TYPE = "coverType";
 	public static final String PAGES = "noOfPages";

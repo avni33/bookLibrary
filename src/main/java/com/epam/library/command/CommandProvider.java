@@ -11,12 +11,14 @@ import com.epam.library.command.impl.EditBookCommand;
 import com.epam.library.command.impl.EditUserCommand;
 import com.epam.library.command.impl.FilterBookCommand;
 import com.epam.library.command.impl.GetBookFromIdCommand;
+import com.epam.library.command.impl.GetBorrowedBooks;
 import com.epam.library.command.impl.GetUserFromIdCommand;
 import com.epam.library.command.impl.GetUsersCommand;
 import com.epam.library.command.impl.LoginCommand;
 import com.epam.library.command.impl.LogoutCommand;
 import com.epam.library.command.impl.RateBookCommand;
 import com.epam.library.command.impl.RegisterCommand;
+import com.epam.library.command.impl.ReturnBookCommand;
 import com.epam.library.command.impl.SearchBookCommand;
 
 public class CommandProvider {
@@ -56,6 +58,10 @@ public class CommandProvider {
 				GetUsersCommand.getInstance());
 		commandMap.put(CommandEnum.USER_FROM_ID.toString(), 
 				GetUserFromIdCommand.getInstance());
+		commandMap.put(CommandEnum.RETURN_BOOK.toString(), 
+				ReturnBookCommand.getInstance());
+		commandMap.put(CommandEnum.GET_BORROWED_BOOKS.toString(), 
+				GetBorrowedBooks.getInstance());
 	}
 	
 	public static final CommandProvider getInstance() {

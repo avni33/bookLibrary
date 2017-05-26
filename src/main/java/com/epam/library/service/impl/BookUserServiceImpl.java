@@ -1,14 +1,18 @@
 package com.epam.library.service.impl;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.epam.library.dao.BookDAO;
 import com.epam.library.dao.DAOFactory;
 import com.epam.library.dao.UserDAO;
 import com.epam.library.dao.exception.DAOException;
+import com.epam.library.domain.Book;
 import com.epam.library.domain.BorrowedBook;
 import com.epam.library.service.BookUserService;
+import com.epam.library.service.checker.ResultChecker;
 import com.epam.library.service.exception.ServiceException;
 
 public class BookUserServiceImpl implements BookUserService {
@@ -26,6 +30,62 @@ public class BookUserServiceImpl implements BookUserService {
 		return INSTANCE;
 	}
 
+	@Override
+	public boolean rateBook(int userId, int bookId, int rating) throws ServiceException {
+		boolean ratingDone = false;
+		try {
+			ratingDone = bookDAO.rateBook(userId, bookId, rating);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return ratingDone;
+	}
+
+	@Override
+	public float getRating(int bookId) throws ServiceException {
+		float rating = 0;
+		try {
+			rating = bookDAO.getRating(bookId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return rating;
+	}
+
+	@Override
+	public int getUserRating(int userId, int bookId) throws ServiceException {
+		int rating = 0;
+		try {
+			rating = bookDAO.getUserRating(userId, bookId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return rating;
+	}
+
+	@Override
+	public Map<BorrowedBook, Book> getBorrowedBooks(int userId, String language) throws ServiceException {
+		Map<BorrowedBook, Book> borrowedBooksMap = new HashMap<BorrowedBook, Book>();
+		try {
+			borrowedBooksMap = bookDAO.gerBorrowedBooks(userId, language);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		ResultChecker.checkBorrowedBooks(borrowedBooksMap);
+		return borrowedBooksMap;
+	}
+
+	@Override
+	public boolean returnBook(int userId, int bookId) throws ServiceException {
+		boolean returned = false;
+		try {
+			returned = bookDAO.returnBook(userId, bookId);
+		} catch (DAOException e) {
+			throw new ServiceException(e);
+		}
+		return returned;
+	}
+	
 	@Override
 	public boolean borrowBook(int bookId, int userId) throws ServiceException {
 		if(!validUserId(userId)) {

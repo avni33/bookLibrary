@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,17 +49,17 @@ public class BookDAOImpl implements BookDAO {
 			+ "like ? or bt_description like ? or bt_author like ? or "
 			+ "b_publish_year like ?) having bt_language_code = ?";
 	private static final String SQL_INSERT_PAPER_BOOK = 
-			"{ call insert_paper_book(?,?,?,?,?,?,?) }";
+			"{ call insert_paper_book(?,?,?,?,?,?,?,?) }";
 	private static final String SQL_INSERT_EBOOK = 
-			"{ call insert_ebook(?,?,?,?,?,?) }";
+			"{ call insert_ebook(?,?,?,?,?,?,?) }";
 	private static final String SQL_UPDATE_PAPER_BOOK = 
-			"{ call update_paper_book(?,?,?,?,?,?,?,?,?) }";
+			"{ call update_paper_book(?,?,?,?,?,?,?,?,?,?) }";
 	private static final String SQL_UPDATE_EBOOK = 
-			"{ call update_ebook(?,?,?,?,?,?,?,?) }";
+			"{ call update_ebook(?,?,?,?,?,?,?,?,?) }";
 	private static final String SQL_UPDATE_TRANSLATE_PAPER_BOOK = 
-			"{ call update_translate_paper_book(?,?,?,?,?,?,?,?,?) }";
+			"{ call update_translate_paper_book(?,?,?,?,?,?,?,?,?,?) }";
 	private static final String SQL_UPDATE_TRANSLATE_EBOOK = 
-			"{ call update_translate_ebook(?,?,?,?,?,?,?,?) }";
+			"{ call update_translate_ebook(?,?,?,?,?,?,?,?,?) }";
 	private static final String SQL_GET_ID_FOR_BOOK_TRANSLATION = 
 			"select b_id from book join book_translation on b_id "
 			+ "= bt_book where b_id = ? and bt_language_code = ?";
@@ -70,13 +71,10 @@ public class BookDAOImpl implements BookDAO {
 			+ " join book_translation on b_id=bt_book left join paper_book_translation"
 			+ " on pb_id=pbt_paper_book where (pbt_language_code = ? or "
 			+ "ebt_language_code = ?) and  bt_title like ? and bt_author like"
-			+ " ? and bt_description like ? and b_price_usd like ? and "
-			+ "b_publish_year like ? and (pb_pages like ? or pb_pages is"
-			+ " null) and (pbt_cover like ? or pbt_cover is null) and "
-			+ "(ebt_file_format like ? or ebt_file_format is null) "
-			+ "having bt_language_code = ?";
+			+ " ? and bt_description like ? and b_price_usd >= ? and b_price_usd <= ? and "
+			+ "b_publish_year like ? having bt_language_code = ?";
 	private static final String SQL_RATE_BOOK = 
-			"{ call insert_update_rating(?,?,?) }";
+			"{ call insert_update_rating(?,?,?,?) }";
 	private static final String SQL_GET_RATING = 
 			"select avg(r_rating) as rate from rating where r_book = ?";
 	private static final String SQL_GET_USER_RATING = 
@@ -86,6 +84,11 @@ public class BookDAOImpl implements BookDAO {
 	private static final String SQL_INSERT_BORROWED_BOOK = 
 			"INSERT INTO `book_borrow` (`bb_user`, `bb_book`, `bb_borrow_date`,"
 			+ " `bb_return_date`, `bb_returned`) VALUES (?,?,?,?,?)";
+	private static final String SQL_GET_BORROWED_BOOKS = 
+			"select b_id, bb_borrow_date, bb_return_date from book join"
+			+ " book_borrow on b_id = bb_book where bb_user = ? and bb_returned = 0";
+	private static final String SQL_RETURN_BORROWED_BOOK = 
+			"update book_borrow set bb_returned = 1 where bb_user = ? and bb_book = ?";
 	private static final int ONE = 1;
 	private static final int TWO = 2;
 	private static final int THREE = 3;
@@ -96,7 +99,6 @@ public class BookDAOImpl implements BookDAO {
 	private static final int EIGHT = 8;
 	private static final int NINE = 9;
 	private static final int TEN = 10;
-	private static final int ELEVEN = 11;
 	private static final String PERCENT = "%";
 	private static final String DEFAULT_LANGUAGE = "en";
 	private static final String PAPER = "paper";
@@ -261,10 +263,12 @@ public class BookDAOImpl implements BookDAO {
 	
 	private boolean insertPaperBook(PaperBook paperBook, Connection connection) 
 			throws DAOException {
-		boolean paperBookInserted = true;
+		boolean paperBookInserted = false;
 		try(CallableStatement statement = 
 				getCallableStatementForPaperBookInsertion(paperBook, connection);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(EIGHT);
+			paperBookInserted = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -283,15 +287,18 @@ public class BookDAOImpl implements BookDAO {
 		statement.setString(FIVE, paperBook.getDescription());
 		statement.setInt(SIX, paperBook.getNoOfPages());
 		statement.setString(SEVEN, paperBook.getCoverType());
+		statement.registerOutParameter(EIGHT, Types.INTEGER);
 		return statement;
 	}
 	
 	private boolean insertEbook(Ebook ebook, Connection connection) 
 			throws DAOException {
-		boolean ebookInserted = true;
+		boolean ebookInserted = false;
 		try(CallableStatement statement = 
 				getCallableStatementForEbookInsertion(ebook, connection);) {
 			statement.execute();
+			int rows = statement.getInt(SEVEN);
+			ebookInserted = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -310,6 +317,7 @@ public class BookDAOImpl implements BookDAO {
 		statement.setString(FOUR, ebook.getAuthor());
 		statement.setString(FIVE, ebook.getDescription());
 		statement.setString(SIX, ebook.getFileFormat());
+		statement.registerOutParameter(SEVEN, Types.INTEGER);
 		return statement;
 	}
 	
@@ -389,11 +397,13 @@ public class BookDAOImpl implements BookDAO {
 	
 	private boolean updatePaperBook(PaperBook paperBook, String language,
 			Connection connection) throws DAOException {
-		boolean paperBookUpdated = true;
+		boolean paperBookUpdated = false;
 		try(CallableStatement statement = 
 				getCallableStatementForPaperBookUpdation(paperBook,
 						connection, language);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(TEN);
+			paperBookUpdated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -422,15 +432,18 @@ public class BookDAOImpl implements BookDAO {
 		statement.setInt(SEVEN, paperBook.getNoOfPages());
 		statement.setString(EIGHT, paperBook.getCoverType());
 		statement.setString(NINE, language);
+		statement.registerOutParameter(TEN, Types.INTEGER);
 		return statement;
 	}
 	
 	private boolean updateEbook(Ebook ebook, String language, Connection connection) 
 			throws DAOException {
-		boolean ebookUpdated = true;
+		boolean ebookUpdated = false;
 		try(CallableStatement statement = getCallableStatementForEbookUpdation(
 				ebook, connection, language);) {
 			statement.execute();
+			int rows = statement.getInt(NINE);
+			ebookUpdated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -457,6 +470,7 @@ public class BookDAOImpl implements BookDAO {
 		statement.setString(SIX, ebook.getDescription());
 		statement.setString(SEVEN, ebook.getFileFormat());
 		statement.setString(EIGHT, language);
+		statement.registerOutParameter(NINE, Types.INTEGER);
 		return statement;
 	}
 	
@@ -476,11 +490,13 @@ public class BookDAOImpl implements BookDAO {
 	
 	private boolean updateTranslatePaperBook(PaperBook paperBook, String language, 
 			Connection connection) throws DAOException {
-		boolean paperBookUpdatedTranslated = true;
+		boolean paperBookUpdatedTranslated = false;
 		try(CallableStatement statement = 
 				getCallableStatementForPaperBookUpdateTranslation(paperBook, 
 						connection, language);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(TEN);
+			paperBookUpdatedTranslated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -500,11 +516,13 @@ public class BookDAOImpl implements BookDAO {
 	
 	private boolean updateTranslateEbook(Ebook ebook, String language, 
 			Connection connection) throws DAOException {
-		boolean ebookUpdatedTranslated = true;
+		boolean ebookUpdatedTranslated = false;
 		try(CallableStatement statement = 
 				getCallableStatementForEbookUpdateTranslation(ebook, 
 						connection, language);) {
 			statement.execute();
+			int rows = statement.getInt(NINE);
+			ebookUpdatedTranslated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -523,7 +541,7 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public List<Book> getFilteredBooks(Map<String, String> filterParameters, String language) throws DAOException {
+	public List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		List<Book> books = new ArrayList<Book>();
 		checkConnection(connection);
@@ -544,31 +562,31 @@ public class BookDAOImpl implements BookDAO {
 
 	private PreparedStatement createPreparedStatementForFilteredBooks
 	(Connection connection, String language,
-			Map<String, String> filterParameters) throws SQLException {
+			Map<String, Object> filterParameters) throws SQLException {
 		PreparedStatement statement = 
 				connection.prepareStatement(SQL_GET_FILTERED_BOOKS);
 		statement.setString(ONE, language);
 		statement.setString(TWO, language);
-		statement.setString(THREE, PERCENT + filterParameters.get(Constant.TITLE) + PERCENT);
-		statement.setString(FOUR, PERCENT + filterParameters.get(Constant.AUTHOR) + PERCENT);
-		statement.setString(FIVE, PERCENT + filterParameters.get(Constant.DESCRIPTION) + PERCENT);
-		statement.setString(SIX, PERCENT + filterParameters.get(Constant.PRICE) + PERCENT);
-		statement.setString(SEVEN, PERCENT + filterParameters.get(Constant.PUBLISH_YEAR) + PERCENT);
-		statement.setString(EIGHT, PERCENT + filterParameters.get(Constant.PAGES) + PERCENT);
-		statement.setString(NINE, PERCENT + filterParameters.get(Constant.COVER_TYPE) + PERCENT);
-		statement.setString(TEN, PERCENT + filterParameters.get(Constant.FILE_FORMAT) + PERCENT);
-		statement.setString(ELEVEN, language);
+		statement.setString(THREE, PERCENT + (String) filterParameters.get(Constant.TITLE) + PERCENT);
+		statement.setString(FOUR, PERCENT + (String) filterParameters.get(Constant.AUTHOR) + PERCENT);
+		statement.setString(FIVE, PERCENT + (String) filterParameters.get(Constant.DESCRIPTION) + PERCENT);
+		statement.setInt(SIX, Integer.parseInt((String) filterParameters.get(Constant.MIN_PRICE)));
+		statement.setInt(SEVEN, Integer.parseInt((String) filterParameters.get(Constant.MAX_PRICE)));
+		statement.setString(EIGHT, PERCENT + (String) filterParameters.get(Constant.PUBLISH_YEAR) + PERCENT);
+		statement.setString(NINE, language);
 		return statement;
 	}
 
 	@Override
 	public boolean rateBook(int userId, int bookId, int rating) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		boolean ratingDone = true;
+		boolean ratingDone = false;
 		checkConnection(connection);
 		try (CallableStatement statement = 
 				getCallableStatementForRating(userId, bookId, rating, connection);) {
 			statement.execute();
+			int rows = statement.getInt(FOUR);
+			ratingDone = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException("Issue with DB parameters while " 
 		+ "rating books.", se);
@@ -584,6 +602,7 @@ public class BookDAOImpl implements BookDAO {
 		statement.setInt(ONE, userId);
 		statement.setInt(TWO, bookId);
 		statement.setInt(THREE, rating);
+		statement.registerOutParameter(FOUR, Types.INTEGER);
 		return statement;
 	}
 
@@ -679,11 +698,12 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public boolean insertBorrowedBook(BorrowedBook borrowedBook) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		boolean inserted = true;
+		boolean inserted = false;
 		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForInsertingBorrowedBook(connection, borrowedBook);) {
-			statement.executeUpdate();
+			int rows = statement.executeUpdate();
+			inserted = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException("Issue with DB parameters while " 
 		+ "inserting borrowed book.", se);
@@ -704,6 +724,83 @@ public class BookDAOImpl implements BookDAO {
 		statement.setDate(FOUR, Date.valueOf(borrowedBook.getReturnDate()));
 		statement.setBoolean(FIVE, borrowedBook.isReturnedBook());
 		return statement;
+	}
+
+	@Override
+	public Map<BorrowedBook, Book> gerBorrowedBooks(int userId, String language) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		checkConnection(connection);
+		List<BorrowedBook> borrowedBooks = new ArrayList<BorrowedBook>();
+		try (PreparedStatement statement = 
+				createPreparedStatementForBorrowedBook(connection, userId);
+				ResultSet set = statement.executeQuery();) {
+			while(set.next()) {
+				borrowedBooks.add(getBorrowedBookFromResultSet(set));
+			}
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "getting borrowed book.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		Map<BorrowedBook, Book> borrowedBooksMap = new HashMap<BorrowedBook, Book>();
+		for(BorrowedBook borrowedBook : borrowedBooks) {
+			borrowedBooksMap.put(borrowedBook, getBook(language, borrowedBook.getBookId()));
+		}
+		return borrowedBooksMap;
+	}
+	
+	private PreparedStatement createPreparedStatementForBorrowedBook
+	(Connection connection, int userId)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_GET_BORROWED_BOOKS);
+		statement.setInt(ONE, userId);
+		return statement;
+	}
+	
+	private BorrowedBook getBorrowedBookFromResultSet(ResultSet set) throws SQLException {
+		BorrowedBook borrowedBook = new BorrowedBook();
+		borrowedBook.setBookId(set.getInt(FieldName.BOOK_ID.toString()));
+		borrowedBook.setBorrowedDate(set.getDate(FieldName.BORROW_DATE.toString()).toLocalDate());
+		borrowedBook.setReturnDate(set.getDate(FieldName.RETURN_DATE.toString()).toLocalDate());
+		return borrowedBook;
+	}
+
+	@Override
+	public boolean returnBook(int userId, int bookId) throws DAOException {
+		Connection connection = MySQLConnectionPool.getConnection();
+		boolean returned = false;
+		checkConnection(connection);
+		try (PreparedStatement statement = 
+				createPreparedStatementForReturningBorrowedBook(connection, userId, bookId);) {
+			int rows = statement.executeUpdate();
+			returned = checkIfInserted(rows);
+		} catch (SQLException se) {
+			throw new DAOException("Issue with DB parameters while " 
+		+ "returning borrowed book.", se);
+		} finally {
+			MySQLConnectionPool.returnConnectionToPool(connection);
+		}
+		return returned;
+	}
+	
+	private PreparedStatement createPreparedStatementForReturningBorrowedBook
+	(Connection connection, int userId, int bookId)
+			throws SQLException {
+		PreparedStatement statement = connection
+				.prepareStatement(SQL_RETURN_BORROWED_BOOK);
+		statement.setInt(ONE, userId);
+		statement.setInt(TWO, bookId);
+		return statement;
+	}
+	
+	private boolean checkIfInserted(int rows) {
+		boolean insertDone = false;
+		if(rows > 0) {
+			insertDone = true;
+		}
+		return insertDone;
 	}
 
 }

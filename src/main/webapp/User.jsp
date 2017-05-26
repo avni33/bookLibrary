@@ -69,11 +69,9 @@ td {
 			<input type = "hidden" name = "title" value = "${param.title }"/>
 			<input type = "hidden" name = "author" value = "${param.author }"/>
 			<input type = "hidden" name = "description" value = "${param.description }"/>
-			<input type = "hidden" name = "price" value = "${param.price }"/>
-			<input type = "hidden" name = "publishYear" value = "${param.publishYear }"/>
-			<input type = "hidden" name = "noOfPages" value = "${param.noOfPages }"/>
-			<input type = "hidden" name = "coverType" value = "${param.coverType }"/>
-			<input type = "hidden" name = "fileFormat" value = "${param.fileFormat }"/> <select
+			<input type = "hidden" name = "minprice" value = "${param.minprice }"/>
+			<input type = "hidden" name = "maxprice" value = "${param.maxprice }"/>
+			<input type = "hidden" name = "publishYear" value = "${param.publishYear }"/> <select
 			id="language" name="language" onchange="submit()">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
@@ -81,9 +79,10 @@ td {
 		</select>
 	</form>
 	<h1>
-		<form id="editUserForm" action="EditUser.jsp" style = "float : left;">
-		<fmt:message key="text.button.editProfile" var="editButton" />
-		<input type="submit" value="${editButton }" />
+		<form action="Controller" method = "get" style = "float : left;">
+		<input type = "hidden" name = "command" value = "getBorrowBooks"/>
+		<fmt:message key="text.user.borrowed" var="borrowButton" />
+		<input type="submit" value="${borrowButton }" />
 	</form>
 	<fmt:message key="text.header.hello" />
 		,
@@ -98,16 +97,18 @@ td {
 	</h1>
 	
 	<h1>
+	<form id="editUserForm" action="EditUser.jsp" style = "float : left;">
+		<fmt:message key="text.button.editProfile" var="editButton" />
+		<input type="submit" value="${editButton }" />
+	</form>
 	<form id="filterForm" action="Controller" method="get">
 		<input type="hidden" name="command" value="filterBook" placeholder="<fmt:message key="text.book.author" />" /> 
 		        <input type="text" name="title" placeholder="<fmt:message key="text.heading.title" />" />
 				&nbsp;<input type="text" name="author" placeholder="<fmt:message key="text.heading.author" />" />
 				&nbsp;<input type="text" name="description" placeholder="<fmt:message key="text.heading.description" />" />
-				&nbsp;<input type="text" name="price" placeholder="<fmt:message key="text.heading.price" />" />
+				&nbsp;<input type="text" name="minprice" placeholder="<fmt:message key="text.heading.minprice" />" pattern="^$|^\d+(\.\d{1,2})?$" />
+				&nbsp;<input type="text" name="maxprice" placeholder="<fmt:message key="text.heading.maxprice" />" pattern="^$|^\d+(\.\d{1,2})?$" />
 				&nbsp;<input type="text" name="publishYear" placeholder="<fmt:message key="text.heading.year" />" />
-				&nbsp;<input type="text" name="noOfPages" placeholder="<fmt:message key="text.heading.pages" />" />
-				&nbsp;<input type="text" name="coverType" placeholder="<fmt:message key="text.heading.cover" />" />
-				&nbsp;<input type="text" name="fileFormat" placeholder="<fmt:message key="text.heading.file" />" />
 		<fmt:message key="text.button.filter" var="filterButton" />
 		&nbsp;<input type="submit" value="${filterButton }" />
 	</form>

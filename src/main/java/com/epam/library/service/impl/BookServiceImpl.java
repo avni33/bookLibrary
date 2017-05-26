@@ -2,7 +2,6 @@ package com.epam.library.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +22,8 @@ public class BookServiceImpl implements BookService {
 	
 	private static final String PAPER = "paper";
 	private static final String EMPTY_STRING = "";
+	private static final String DEFAULT_MIN_PRICE = "0";
+	private static final String DEFAULT_MAX_PRICE = "100";
 	
 	private DAOFactory daoFactory = DAOFactory.getInstance();
 	private BookDAO bookDAO = daoFactory.getBookDao();
@@ -125,7 +126,7 @@ public class BookServiceImpl implements BookService {
 	public List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language)
 			throws ServiceException {
 		List<Book> books = new ArrayList<Book>();
-		Map<String, String> newFilterParameters = replaceNullValuesWithEmptyString(filterParameters);
+		Map<String, Object> newFilterParameters = replaceNullValuesWithEmptyString(filterParameters);
 		try {
 			books = bookDAO.getFilteredBooks(newFilterParameters, language);
 		} catch (DAOException e) {
@@ -135,48 +136,20 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 	
-	private Map<String, String> replaceNullValuesWithEmptyString(Map<String, Object> filterParameters) {
-		Map<String, String> newFilterParameters = new HashMap<String, String>();
+	private Map<String, Object> replaceNullValuesWithEmptyString(Map<String, Object> filterParameters) {
 		for(Map.Entry<String, Object> entry : filterParameters.entrySet()) {
 			if(entry.getValue() == null) {
 				entry.setValue(EMPTY_STRING);
 			}
-			newFilterParameters.put(entry.getKey(), (String) entry.getValue());
+			if(entry.getKey().equals(Constant.MIN_PRICE) && entry.getValue().equals(EMPTY_STRING)) {
+				entry.setValue(DEFAULT_MIN_PRICE);
+			} else if(entry.getKey().equals(Constant.MAX_PRICE) && entry.getValue().equals(EMPTY_STRING))  {
+				entry.setValue(DEFAULT_MAX_PRICE);
+			}
 		}
-		return newFilterParameters;
+		return filterParameters;
 	}
 
-	@Override
-	public boolean rateBook(int userId, int bookId, int rating) throws ServiceException {
-		boolean ratingDone = false;
-		try {
-			ratingDone = bookDAO.rateBook(userId, bookId, rating);
-		} catch (DAOException e) {
-			throw new ServiceException(e);
-		}
-		return ratingDone;
-	}
 
-	@Override
-	public float getRating(int bookId) throws ServiceException {
-		float rating = 0;
-		try {
-			rating = bookDAO.getRating(bookId);
-		} catch (DAOException e) {
-			throw new ServiceException(e);
-		}
-		return rating;
-	}
-
-	@Override
-	public int getUserRating(int userId, int bookId) throws ServiceException {
-		int rating = 0;
-		try {
-			rating = bookDAO.getUserRating(userId, bookId);
-		} catch (DAOException e) {
-			throw new ServiceException(e);
-		}
-		return rating;
-	}
 
 }

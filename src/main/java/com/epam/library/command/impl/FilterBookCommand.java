@@ -1,6 +1,7 @@
 package com.epam.library.command.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import com.epam.library.command.Command;
 import com.epam.library.command.Constant;
 import com.epam.library.command.TargetFileProvider;
 import com.epam.library.command.util.LanguageProvider;
-import com.epam.library.command.util.ParameterProvider;
 import com.epam.library.domain.Book;
 import com.epam.library.domain.User;
 import com.epam.library.service.BookService;
@@ -47,8 +47,7 @@ public class FilterBookCommand implements Command {
 		String targetResource = null;
 		HttpSession session = request.getSession(false);
 		String language = LanguageProvider.getLanguage(request);
-		Map<String, Object> filterParameters = 
-				ParameterProvider.getMapFromRequestParameters(request);
+		Map<String, Object> filterParameters = getMapFromRequestParameters(request);
 		User user = (User) session.getAttribute(Constant.USER);
 		try {
 			List<Book> books = bookService.getFilteredBooks(filterParameters, language);
@@ -62,5 +61,17 @@ public class FilterBookCommand implements Command {
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetResource);
 		requestDispatcher.forward(request, response);
 	}
+	
+	private static Map<String, Object> getMapFromRequestParameters(HttpServletRequest request) {
+		Map<String, Object> requestParameters = new HashMap<String, Object>();
+		requestParameters.put(Constant.TITLE, request.getParameter(Constant.TITLE));
+		requestParameters.put(Constant.AUTHOR, request.getParameter(Constant.AUTHOR));
+		requestParameters.put(Constant.DESCRIPTION, request.getParameter(Constant.DESCRIPTION));
+		requestParameters.put(Constant.MIN_PRICE, request.getParameter(Constant.MIN_PRICE));
+		requestParameters.put(Constant.MAX_PRICE, request.getParameter(Constant.MAX_PRICE));
+		requestParameters.put(Constant.PUBLISH_YEAR, request.getParameter(Constant.PUBLISH_YEAR));
+		return requestParameters;
+	}
+
 
 }

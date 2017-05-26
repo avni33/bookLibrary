@@ -12,7 +12,7 @@
 <html lang="${language }">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>User Details</title>
+<title>Borrowed Books List</title>
 <link rel="stylesheet" href="css/details.css">
 <style>
 body {
@@ -31,6 +31,7 @@ td {
 tr:nth-child(even) {
 	background-color: #f2f2f2
 }
+
 .error {
 	color: #D8000C;
 	background-color: #FFBABA;
@@ -38,21 +39,22 @@ tr:nth-child(even) {
 	font-size: 2em;
 	vertical-align: middle;
 }
+
 .success {
 	color: #4F8A10;
-background-color: #DFF2BF;
-	margin: 10px 22px;
-	font-size: 2em;
-	vertical-align: middle;
-}
-.info {
-	color: #00529B;
-background-color: #BDE5F8;
+	background-color: #DFF2BF;
 	margin: 10px 22px;
 	font-size: 2em;
 	vertical-align: middle;
 }
 
+.info {
+	color: #00529B;
+	background-color: #BDE5F8;
+	margin: 10px 22px;
+	font-size: 2em;
+	vertical-align: middle;
+}
 </style>
 </head>
 <body onkeydown="return (event.keyCode != 116)">
@@ -71,34 +73,30 @@ background-color: #BDE5F8;
 	</c:if>
 
 	<form style="float: right;" action="Controller" method="get">
-		<input type="hidden" name="previousCmd" value="${command }" />  <input
-			type="hidden" name="command" value="changeLanguage" /> <input
-			type="hidden" name="id" value="${param.id }" /> <select id="language"
-			name="language" onchange="submit()">
+		<input type="hidden" name="previousCmd" value="${command }" /> <input
+			type="hidden" name="command" value="changeLanguage" /> <select
+			id="language" name="language" onchange="submit()">
 			<option value="en" ${language == 'en' ? 'selected' : ''}>English</option>
 			<option value="hi" ${language == 'hi' ? 'selected' : ''}>Hindi</option>
 			<option value="be" ${language == 'be' ? 'selected' : ''}>Belarusian</option>
 		</select>
 	</form>
 	<h1>
+		<form action="Controller" method="get" style="float: left;">
+			<input type="hidden" name="command" value="categoryChange" /> <input
+				type="hidden" name="category" value="all" />
+			<fmt:message key="text.users.booklist" var="booksButton" />
+			<input type="submit" value="${booksButton }" />
+		</form>
+		<fmt:message key="text.header.hello" />
+		,
 		<fmt:message key="text.header.user" />
+		<c:out value="${user.name }"></c:out>
+
 	</h1>
-	<table align="center">
-		<tr>
-			<td><fmt:message key="text.heading.id" /></td>
-			<td><c:out value="${selectedUser.id }" /></td>
-		</tr>
-		<tr>
-			<td><fmt:message key="text.label.username" /></td>
-			<td><c:out value="${selectedUser.userName }" /></td>
-		</tr>
-		<tr>
-			<td><fmt:message key="text.header.user" /></td>
-			<td><c:out value="${selectedUser.name }" /></td>
-		</tr>
-			</table>
-	<br>
-	<h1><fmt:message key="text.user.borrowed" /></h1>
+	<h1>
+		<fmt:message key="text.user.borrowed" />
+	</h1>
 	<c:choose>
 		<c:when test="${empty error}">
 			<table align="center">
@@ -109,27 +107,17 @@ background-color: #BDE5F8;
 						<th><fmt:message key="text.table.author" /></th>
 						<th><fmt:message key="text.heading.borrowedDate" /></th>
 						<th><fmt:message key="text.heading.returnDate" /></th>
-						<th><fmt:message key="text.heading.return" /></th>
 					</tr>
 					<c:forEach items="${borrowedBooks}" var="book">
-							<tr>
-								<td><c:out value="${book.value.id }"></c:out></td>
-								<td><c:out value="${book.value.title }"></c:out></td>
-								<td><c:out value="${book.value.author }"></c:out></td>
-								<td><c:out value="${book.key.borrowedDate }"></c:out></td>
-								<td><c:out value="${book.key.returnDate }"></c:out></td>
-								<td>
-						<form action = "Controller" method = "get">
-							<input type="hidden" name="command" value="returnBook" />
-							<input type = "hidden" name = "id" value = "${selectedUser.id }"/>
-							<input type = "hidden" name = "bookId" value = "${book.value.id}"/>
-							<fmt:message key="text.heading.return" var="returnbuttonValue" />
-							<input type="submit" value="${returnbuttonValue }" />
-						</form>
-						</td>
-							</tr>
-						
-						
+						<tr>
+							<td><c:out value="${book.value.id }"></c:out></td>
+							<td><c:out value="${book.value.title }"></c:out></td>
+							<td><c:out value="${book.value.author }"></c:out></td>
+							<td><c:out value="${book.key.borrowedDate }"></c:out></td>
+							<td><c:out value="${book.key.returnDate }"></c:out></td>
+						</tr>
+
+
 					</c:forEach>
 				</tbody>
 			</table>
@@ -142,9 +130,9 @@ background-color: #BDE5F8;
 		</c:otherwise>
 	</c:choose>
 	<br>
-	<form name="backForm" action="Controller" method="get">
-		<input type = "hidden" name = "command" value = "getUsers"/>
-		<fmt:message key="text.admin.users" var="buttonValue" />
+	<form name="logoutForm" action="Controller" method="post">
+		<input type="hidden" name="command" value="logout" />
+		<fmt:message key="text.button.logout" var="buttonValue" />
 		<input type="submit" value="${buttonValue }" />
 	</form>
 </body>

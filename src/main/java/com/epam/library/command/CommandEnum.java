@@ -16,7 +16,9 @@ public enum CommandEnum {
 	RATE_BOOK("rateBook"),
 	BORROW_BOOK("borrowBook"),
 	GET_USERS("getUsers"),
-	USER_FROM_ID("userFromId");
+	USER_FROM_ID("userFromId"),
+	RETURN_BOOK("returnBook"),
+	GET_BORROWED_BOOKS("getBorrowBooks");
 	
 	private String command;
 	

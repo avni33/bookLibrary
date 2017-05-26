@@ -67,11 +67,9 @@ td {
 				<input type = "hidden" name = "title" value = "${param.title }"/>
 			<input type = "hidden" name = "author" value = "${param.author }"/>
 			<input type = "hidden" name = "description" value = "${param.description }"/>
-			<input type = "hidden" name = "price" value = "${param.price }"/>
+			<input type = "hidden" name = "minprice" value = "${param.minprice }"/>
+			<input type = "hidden" name = "maxprice" value = "${param.maxprice }"/>
 			<input type = "hidden" name = "publishYear" value = "${param.publishYear }"/>
-			<input type = "hidden" name = "noOfPages" value = "${param.noOfPages }"/>
-			<input type = "hidden" name = "coverType" value = "${param.coverType }"/>
-			<input type = "hidden" name = "fileFormat" value = "${param.fileFormat }"/>
 			 <input
 			type="hidden" name="searchText" value="${param.searchText }" /> <select
 			id="language" name="language" onchange="submit()">
@@ -114,11 +112,9 @@ td {
 		        <input type="text" name="title" placeholder="<fmt:message key="text.heading.title" />" />
 				&nbsp;<input type="text" name="author" placeholder="<fmt:message key="text.heading.author" />" />
 				&nbsp;<input type="text" name="description" placeholder="<fmt:message key="text.heading.description" />" />
-				&nbsp;<input type="text" name="price" placeholder="<fmt:message key="text.heading.price" />" />
+				&nbsp;<input type="text" name="minprice" placeholder="<fmt:message key="text.heading.minprice" />" pattern="^$|^\d+(\.\d{1,2})?$" />
+				&nbsp;<input type="text" name="maxprice" placeholder="<fmt:message key="text.heading.maxprice" />" pattern="^$|^\d+(\.\d{1,2})?$" />
 				&nbsp;<input type="text" name="publishYear" placeholder="<fmt:message key="text.heading.year" />" />
-				&nbsp;<input type="text" name="noOfPages" placeholder="<fmt:message key="text.heading.pages" />" />
-				&nbsp;<input type="text" name="coverType" placeholder="<fmt:message key="text.heading.cover" />" />
-				&nbsp;<input type="text" name="fileFormat" placeholder="<fmt:message key="text.heading.file" />" />
 		<fmt:message key="text.button.filter" var="filterButton" />
 		&nbsp;<input type="submit" value="${filterButton }" />
 	</form>

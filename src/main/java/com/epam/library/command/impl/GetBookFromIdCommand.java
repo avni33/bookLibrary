@@ -21,6 +21,7 @@ import com.epam.library.domain.Ebook;
 import com.epam.library.domain.PaperBook;
 import com.epam.library.domain.User;
 import com.epam.library.service.BookService;
+import com.epam.library.service.BookUserService;
 import com.epam.library.service.ServiceFactory;
 import com.epam.library.service.exception.ServiceException;
 
@@ -39,6 +40,7 @@ public class GetBookFromIdCommand implements Command {
 	
 	private ServiceFactory serviceFactory = ServiceFactory.getInstance();
 	private BookService bookService = serviceFactory.getBookService();
+	private BookUserService bookUserService = serviceFactory.getBookUserService();
 	private TargetFileProvider targetFileProvider = TargetFileProvider.getInstance();
 	
 	private GetBookFromIdCommand() {}
@@ -58,9 +60,9 @@ public class GetBookFromIdCommand implements Command {
 		try {
 			Book book = bookService.getBookFromId(language, bookId);
 			putBookInRequest(book, request);
-			float rating = bookService.getRating(bookId);
+			float rating = bookUserService.getRating(bookId);
 			request.setAttribute(RATING, rating);
-			int userRating = bookService.getUserRating(user.getId(), bookId);
+			int userRating = bookUserService.getUserRating(user.getId(), bookId);
 			request.setAttribute(USER_RATING, userRating);
 			if(EDIT.equals(targetPage)) {
 				targetResource = Constant.EDIT_BOOK_JSP;

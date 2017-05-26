@@ -17,7 +17,9 @@ public enum FieldName {
 	COVER_TYPE("pbt_cover"),
 	FILE_FORMAT("ebt_file_format"),
 	RATE("rate"),
-	RATING("r_rating");
+	RATING("r_rating"),
+	BORROW_DATE("bb_borrow_date"),
+	RETURN_DATE("bb_return_date");
 	
 	private String field;
 	

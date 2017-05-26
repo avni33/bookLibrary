@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +31,11 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	private static final String SQL_GET_ID_FROM_USER_NAME 
 	= "select u_id from user where u_username = ?";
 	private static final String SQL_INSERT_USER 
-	= "{ call insert_user(?,?,?,?) }";
+	= "{ call insert_user(?,?,?,?,?) }";
 	private static final String SQL_UPDATE_USER 
-	= "{ call update_user(?,?,?) }";
+	= "{ call update_user(?,?,?,?) }";
 	private static final String SQL_UPDATE_TRANSLATE_USER 
-	= "{ call update_translate_user(?,?,?) }";
+	= "{ call update_translate_user(?,?,?,?) }";
 	private static final String SQL_GET_ID_FOR_USER_TRANSLATION = 
 			"select ut_user from user_translation where ut_user = ? "
 			+ "and ut_language_code = ?";
@@ -44,6 +45,7 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	private static final int TWO = 2;
 	private static final int THREE = 3;
 	private static final int FOUR = 4;
+	private static final int FIVE = 5;
 	private static final int ZERO = 0;
 	private static final String DEFAULT_LANGUAGE = "en";
 	
@@ -190,10 +192,12 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	}
 	
 	private boolean insertUserInDB(User user, Connection connection) throws DAOException {
-		boolean userInserted = true;
+		boolean userInserted = false;
 		try(CallableStatement statement = 
 				createCallableStatementForInsertingUser(connection, user);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(FIVE);
+			userInserted = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -209,6 +213,7 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		statement.setString(TWO, user.getPassword());
 		statement.setInt(THREE, user.getRole().getId());
 		statement.setString(FOUR, user.getName());
+		statement.registerOutParameter(FIVE, Types.INTEGER);
 		return statement;
 	}
 
@@ -272,10 +277,12 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	
 	private boolean updateUserInDB(User user, Connection connection, String language) 
 			throws DAOException {
-		boolean userUpdated = true;
+		boolean userUpdated = false;
 		try(CallableStatement statement = 
 				createCallableStatementForUpdatingUser(connection, user, language);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(FOUR);
+			userUpdated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -296,16 +303,19 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		statement.setInt(ONE, user.getId());
 		statement.setString(TWO, language);
 		statement.setString(THREE, user.getName());
+		statement.registerOutParameter(FOUR, Types.INTEGER);
 		return statement;
 	}
 	
 	private boolean updateTranslateUserInDB(User user, Connection connection, 
 			String language) throws DAOException {
-		boolean userUpdated = true;
+		boolean userUpdated = false;
 		try(CallableStatement statement = 
 				createCallableStatementForUpdateTranslatingUser(connection, 
 						user, language);) {
 			statement.executeUpdate();
+			int rows = statement.getInt(FOUR);
+			userUpdated = checkIfInserted(rows);
 		} catch (SQLException se) {
 			throw new DAOException(
 					"Issue with DB parameters while "
@@ -364,12 +374,12 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		return user;
 	}
 	
-	/*private boolean checkIfInserted(int rows) {
+	private boolean checkIfInserted(int rows) {
 		boolean insertDone = false;
 		if(rows > 0) {
 			insertDone = true;
 		}
 		return insertDone;
-	}*/
+	}
 	
 }

@@ -19,7 +19,7 @@ public interface BookDAO {
 	
 	boolean editBook(Book book, String category, String language) throws DAOException;
 	
-	List<Book> getFilteredBooks(Map<String, String> filterParameters, String language) throws DAOException;
+	List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language) throws DAOException;
 	
 	boolean rateBook(int userId, int bookId, int rating) throws DAOException;
 	
@@ -30,5 +30,9 @@ public interface BookDAO {
 	boolean checkIfUserHasBorrowedBook(int userId, int bookId) throws DAOException;
 	
 	boolean insertBorrowedBook(BorrowedBook borrowedBook) throws DAOException;
+	
+	Map<BorrowedBook, Book> gerBorrowedBooks(int userId, String language) throws DAOException;
+	
+	boolean returnBook(int userId, int bookId) throws DAOException;
 
 }
