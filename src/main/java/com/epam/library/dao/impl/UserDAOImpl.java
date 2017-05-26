@@ -58,7 +58,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	@Override
 	public User getUserDetails(User user, String language) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		try(PreparedStatement statement = createPreparedStatement(connection, user, language);
 				ResultSet set = statement.executeQuery();) {
 			while (set.next()) {
@@ -96,12 +95,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		user.setId(set.getInt(FieldName.USER_ID.toString()));
 		return user;
 	}
-	
-	private void checkConnection(Connection connection) throws DAOException {
-		if (connection == null) {
-			throw new DAOException("Connection is null");
-		}
-	}
 
 	@Override
 	public User getUserWithChangedLanguage(User user, String language) throws DAOException {
@@ -117,7 +110,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 		Connection connection = MySQLConnectionPool.getConnection();
 		User user = new User();
 		user.setId(userId);
-		checkConnection(connection);
 		try(PreparedStatement statement = 
 				createPreparedStatementForUserFromId(connection, user, language);
 				ResultSet set = statement.executeQuery();) {
@@ -145,7 +137,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	@Override
 	public boolean checkIfUserNameExists(String userName) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean userNameExist = false;
 		try(PreparedStatement statement = 
 				createPreparedStatementForIdFromUserName(connection, userName);
@@ -173,7 +164,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	@Override
 	public boolean insertUser(User user) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean userInserted = false;
 		try {
 			connection.setAutoCommit(false);
@@ -221,7 +211,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	public boolean editUser(User user, String language) throws DAOException {
 		boolean translationExist = checkIfTranslationExist(user, language);
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean userEdited = false;
 		try {
 			connection.setAutoCommit(false);
@@ -246,7 +235,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	private boolean checkIfTranslationExist(User user, String language) 
 			throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean translationExist = false;
 		try (PreparedStatement statement = 
 				createPreparedStatementForTranslationCheck(connection,
@@ -348,7 +336,6 @@ private static final UserDAOImpl INSTANCE = new UserDAOImpl();
 	@Override
 	public List<Integer> getUserIds() throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		List<Integer> userIds = new ArrayList<Integer>();
 		try(PreparedStatement statement = connection.prepareStatement(SQL_GET_ALL_USER_IDS);
 				ResultSet set = statement.executeQuery();) {

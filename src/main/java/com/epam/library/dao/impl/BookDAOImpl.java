@@ -119,7 +119,6 @@ public class BookDAOImpl implements BookDAO {
 		Connection connection = MySQLConnectionPool.getConnection();
 		List<Integer> bookIds = new ArrayList<Integer>();
 		String query = sqlQueryProvider.getQueryForCategory(category);
-		checkConnection(connection);
 		try (PreparedStatement statement = connection.prepareStatement(query);
 				ResultSet set = statement.executeQuery();) {
 			while (set.next()) {
@@ -148,18 +147,11 @@ public class BookDAOImpl implements BookDAO {
 		Builder builder = builderFactory.getBuilder(row);
 		return builder.buildBook(row);
 	}
-	
-	private void checkConnection(Connection connection) throws DAOException {
-		if (connection == null) {
-			throw new DAOException("Connection is null");
-		}
-	}
 
 	@Override
 	public Book getBook(String language, int bookId) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		Book book = null;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForBookFromId
 				(connection, language, bookId);
@@ -196,7 +188,6 @@ public class BookDAOImpl implements BookDAO {
 			throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		List<Book> books = new ArrayList<Book>();
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForSearchedBooks(connection, language,
 				searchText); ResultSet set = statement.executeQuery();) {
@@ -230,7 +221,6 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public boolean insertBook(Book book, String category) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean bookInserted = false;
 		try {
 			connection.setAutoCommit(false);
@@ -326,7 +316,6 @@ public class BookDAOImpl implements BookDAO {
 			throws DAOException {
 		boolean translationExist = checkIfTranslationExist(book, language);
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean bookInserted = false;
 		try {
 			connection.setAutoCommit(false);
@@ -352,7 +341,6 @@ public class BookDAOImpl implements BookDAO {
 	private boolean checkIfTranslationExist(Book book, String language) 
 			throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		boolean translationExist = false;
 		try (PreparedStatement statement = 
 				createPreparedStatementForTranslationCheck(connection,
@@ -544,7 +532,6 @@ public class BookDAOImpl implements BookDAO {
 	public List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		List<Book> books = new ArrayList<Book>();
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForFilteredBooks(connection, language, filterParameters);
 				ResultSet set = statement.executeQuery();) {
@@ -581,7 +568,6 @@ public class BookDAOImpl implements BookDAO {
 	public boolean rateBook(int userId, int bookId, int rating) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		boolean ratingDone = false;
-		checkConnection(connection);
 		try (CallableStatement statement = 
 				getCallableStatementForRating(userId, bookId, rating, connection);) {
 			statement.execute();
@@ -610,7 +596,6 @@ public class BookDAOImpl implements BookDAO {
 	public float getRating(int bookId) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		float rating = 0;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForGettingRating(connection, bookId);
 				ResultSet set = statement.executeQuery();) {
@@ -639,7 +624,6 @@ public class BookDAOImpl implements BookDAO {
 	public int getUserRating(int userId, int bookId) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		int userRating = 0;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForGettingUserRating(connection, bookId, userId);
 				ResultSet set = statement.executeQuery();) {
@@ -669,7 +653,6 @@ public class BookDAOImpl implements BookDAO {
 	public boolean checkIfUserHasBorrowedBook(int userId, int bookId) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		boolean userBorrowedBook = false;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForBorrowedBookId(connection, bookId, userId);
 				ResultSet set = statement.executeQuery();) {
@@ -699,7 +682,6 @@ public class BookDAOImpl implements BookDAO {
 	public boolean insertBorrowedBook(BorrowedBook borrowedBook) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		boolean inserted = false;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForInsertingBorrowedBook(connection, borrowedBook);) {
 			int rows = statement.executeUpdate();
@@ -729,7 +711,6 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public Map<BorrowedBook, Book> gerBorrowedBooks(int userId, String language) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
-		checkConnection(connection);
 		List<BorrowedBook> borrowedBooks = new ArrayList<BorrowedBook>();
 		try (PreparedStatement statement = 
 				createPreparedStatementForBorrowedBook(connection, userId);
@@ -771,7 +752,6 @@ public class BookDAOImpl implements BookDAO {
 	public boolean returnBook(int userId, int bookId) throws DAOException {
 		Connection connection = MySQLConnectionPool.getConnection();
 		boolean returned = false;
-		checkConnection(connection);
 		try (PreparedStatement statement = 
 				createPreparedStatementForReturningBorrowedBook(connection, userId, bookId);) {
 			int rows = statement.executeUpdate();

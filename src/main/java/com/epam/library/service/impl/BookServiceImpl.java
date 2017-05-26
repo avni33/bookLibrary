@@ -15,6 +15,7 @@ import com.epam.library.domain.PaperBook;
 import com.epam.library.service.BookService;
 import com.epam.library.service.checker.ResultChecker;
 import com.epam.library.service.exception.ServiceException;
+import com.epam.library.service.validator.Validator;
 
 public class BookServiceImpl implements BookService {
 
@@ -84,14 +85,16 @@ public class BookServiceImpl implements BookService {
 		return bookInserted;
 	}
 	
-	private Book getBookFromParameters(Map<String, Object> requestParameters, String category) {
+	private Book getBookFromParameters(Map<String, Object> requestParameters, String category) throws ServiceException {
 		if(PAPER.equals(category)) {
+			Validator.validatePaperBookData(requestParameters);
 			PaperBook paperBook = new PaperBook();
 			paperBook.setNoOfPages(Integer.parseInt((String) requestParameters.get(Constant.PAGES)));
 			paperBook.setCoverType((String) requestParameters.get(Constant.COVER_TYPE));
 			paperBook = (PaperBook) setCommonProperties(requestParameters, paperBook);
 			return paperBook;
 		} else {
+			Validator.validateEbookData(requestParameters);
 			Ebook ebook = new Ebook();
 			ebook.setFileFormat((String) requestParameters.get(Constant.FILE_FORMAT));
 			ebook = (Ebook) setCommonProperties(requestParameters, ebook);
@@ -99,7 +102,8 @@ public class BookServiceImpl implements BookService {
 		}
 	}
 	
-	private Book setCommonProperties(Map<String, Object> requestParameters, Book book) {
+	private Book setCommonProperties(Map<String, Object> requestParameters, Book book) throws ServiceException {
+		Validator.validateBookData(requestParameters);
 		book.setAuthor((String) requestParameters.get(Constant.AUTHOR));
 		book.setTitle((String) requestParameters.get(Constant.TITLE));
 		book.setDescription((String) requestParameters.get(Constant.DESCRIPTION));
@@ -126,9 +130,9 @@ public class BookServiceImpl implements BookService {
 	public List<Book> getFilteredBooks(Map<String, Object> filterParameters, String language)
 			throws ServiceException {
 		List<Book> books = new ArrayList<Book>();
-		Map<String, Object> newFilterParameters = replaceNullValuesWithEmptyString(filterParameters);
+		filterParameters = replaceNullValuesWithEmptyString(filterParameters);
 		try {
-			books = bookDAO.getFilteredBooks(newFilterParameters, language);
+			books = bookDAO.getFilteredBooks(filterParameters, language);
 		} catch (DAOException e) {
 			throw new ServiceException(e);
 		}
